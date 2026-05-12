@@ -22,6 +22,8 @@ namespace SaddleHeroesAirWays.Library.Models
         public FlightStatus FlightStatus { get; set; }
 
         public ICollection<Booking>? Bookings { get; set; }
+        public Airport? DepartureAirport { get; set; }
+        public Airport? ArrivalAirport { get; set; }
     }
 
     public enum FlightStatus
