@@ -24,4 +24,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SaddleHeroesAirWays.Library\SaddleHeroesAirWays.Library.csproj" />
+  </ItemGroup>
+
 </Project>

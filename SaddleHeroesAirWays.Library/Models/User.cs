@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SaddleHeroesAirWays.Library.Models
 {
-    internal class User
+     public class User
     {
         public int Id { get; set; }
         public string? Gender { get; set; }

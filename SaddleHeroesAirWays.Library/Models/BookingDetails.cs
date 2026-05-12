@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SaddleHeroesAirWays.Library.Models
 {
-    internal class BookingDetails
+     public class BookingDetails
     {
         public int Id { get; set; }
         public string? BookingReference { get; set; }
