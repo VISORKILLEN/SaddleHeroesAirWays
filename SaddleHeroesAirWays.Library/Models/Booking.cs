@@ -20,11 +20,12 @@ namespace SaddleHeroesAirWays.Library.Models
 
         public User? User { get; set; }
         public Flight? Flight { get; set; }
+        public ICollection<BookingDetails>? BookingDetails { get; set; }
 
-        public Status BookingStatus { get; set; }
+        public BookingStatus BookingStatus { get; set; }
     }
 
-    public enum Status
+    public enum BookingStatus
     {
         Confirmed,
         Cancelled,

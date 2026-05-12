@@ -23,5 +23,6 @@ namespace SaddleHeroesAirWays.Library.Models
         public string? Phonenumber { get; set; }
         public string? SocialSecurityNumber { get; set; }
         public bool IsAdmin { get; set; }
+        public ICollection<Booking>? Bookings { get; set; }
     }
 }

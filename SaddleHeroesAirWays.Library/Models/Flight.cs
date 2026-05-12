@@ -19,10 +19,12 @@ namespace SaddleHeroesAirWays.Library.Models
         public DateTime ArrivalTime { get; set; }
         public int TotalSeats { get; set; }
         public decimal Price { get; set; }
-        public Status FlightStatus { get; set; }
+        public FlightStatus FlightStatus { get; set; }
+
+        public ICollection<Booking>? Bookings { get; set; }
     }
 
-    public enum Status
+    public enum FlightStatus
     {
         Arrived, 
         Delayed, 
