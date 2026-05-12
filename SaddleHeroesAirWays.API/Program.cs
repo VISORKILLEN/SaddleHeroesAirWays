@@ -1,5 +1,7 @@
-using SaddleHeroesAirWays.API;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using SaddleHeroesAirWays.API;
+using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.API
 {
@@ -12,6 +14,8 @@ namespace SaddleHeroesAirWays.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<DbContextAPI>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
