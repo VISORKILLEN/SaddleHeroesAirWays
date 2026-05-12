@@ -18,11 +18,16 @@ namespace SaddleHeroesAirWays.Library.Models
         public DateTime BookingDate { get; set; }
         public decimal TotalPrice { get; set; }
 
-        public enum Status
-        { 
-            Confirmed,
-            Cancelled,
-            Rebooked
-        }
+        public User? User { get; set; }
+        public Flight? Flight { get; set; }
+
+        public Status BookingStatus { get; set; }
+    }
+
+    public enum Status
+    {
+        Confirmed,
+        Cancelled,
+        Rebooked
     }
 }
