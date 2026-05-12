@@ -18,5 +18,7 @@ namespace SaddleHeroesAirWays.Library.Models
         public string? Name { get; set; }
         public string? City { get; set; }
         public string? Country { get; set; }
+        public ICollection<Flight>? DepartingFlights { get; set; }
+        public ICollection<Flight>? ArrivingFlights { get; set; }
     }
 }
