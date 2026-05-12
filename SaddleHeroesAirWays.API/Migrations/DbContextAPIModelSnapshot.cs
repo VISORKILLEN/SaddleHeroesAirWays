@@ -708,13 +708,13 @@ namespace SaddleHeroesAirWays.API.Migrations
                     b.HasOne("SaddleHeroesAirWays.Library.Models.Airport", "ArrivalAirport")
                         .WithMany("ArrivingFlights")
                         .HasForeignKey("ArrivalAirportId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SaddleHeroesAirWays.Library.Models.Airport", "DepartureAirport")
                         .WithMany("DepartingFlights")
                         .HasForeignKey("DepartureAirportId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ArrivalAirport");

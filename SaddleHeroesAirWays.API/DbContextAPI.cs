@@ -14,6 +14,7 @@ namespace SaddleHeroesAirWays.API
             .AddJsonFile("appsettings.json")
             .Build();
 
+
         public DbSet<Airport> airport { get; set; }
         public DbSet<Booking> booking { get; set; }
         public DbSet<BookingDetails> bookingDetails { get; set; }
@@ -23,6 +24,18 @@ namespace SaddleHeroesAirWays.API
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Flight>()
+.HasOne(f => f.DepartureAirport)
+.WithMany(a => a.DepartingFlights)
+.HasForeignKey(f => f.DepartureAirportId)
+.OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Flight>()
+    .HasOne(f => f.ArrivalAirport)
+    .WithMany(a => a.ArrivingFlights)
+    .HasForeignKey(f => f.ArrivalAirportId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             // 1. SEED AIRPORTS
             modelBuilder.Entity<Airport>().HasData(

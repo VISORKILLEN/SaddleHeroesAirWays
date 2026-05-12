@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SaddleHeroesAirWays.API.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class FinalFix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,13 +71,13 @@ namespace SaddleHeroesAirWays.API.Migrations
                         column: x => x.ArrivalAirportId,
                         principalTable: "airport",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_flight_airport_DepartureAirportId",
                         column: x => x.DepartureAirportId,
                         principalTable: "airport",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
