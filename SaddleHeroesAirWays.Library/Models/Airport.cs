@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SaddleHeroesAirWays.Library.Models
 {
-    internal class Airport
+     public class Airport
     {
         public int Id { get; set; }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SaddleHeroesAirWays.Library.Models
 {
-    internal class Booking
+     public class Booking
     {
         [Required]
         [Key]

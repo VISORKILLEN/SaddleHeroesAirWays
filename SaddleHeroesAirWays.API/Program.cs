@@ -1,3 +1,5 @@
+using SaddleHeroesAirWays.API;
+using Microsoft.EntityFrameworkCore;
 
 namespace SaddleHeroesAirWays.API
 {
