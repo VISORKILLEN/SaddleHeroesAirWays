@@ -15,27 +15,27 @@ namespace SaddleHeroesAirWays.API
             .Build();
 
 
-        public DbSet<Airport> airport { get; set; }
-        public DbSet<Booking> booking { get; set; }
-        public DbSet<BookingDetails> bookingDetails { get; set; }
-        public DbSet<Flight> flight { get; set; }
-        public DbSet<User> user { get; set; }
+        public DbSet<Airport> Airport { get; set; }
+        public DbSet<Booking> Booking { get; set; }
+        public DbSet<BookingDetails> BookingDetails { get; set; }
+        public DbSet<Flight> Flight { get; set; }
+        public DbSet<User> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Flight>()
-.HasOne(f => f.DepartureAirport)
-.WithMany(a => a.DepartingFlights)
-.HasForeignKey(f => f.DepartureAirportId)
-.OnDelete(DeleteBehavior.Restrict);
+                .HasOne(f => f.DepartureAirport)
+                .WithMany(a => a.DepartingFlights)
+                .HasForeignKey(f => f.DepartureAirportId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Flight>()
-    .HasOne(f => f.ArrivalAirport)
-    .WithMany(a => a.ArrivingFlights)
-    .HasForeignKey(f => f.ArrivalAirportId)
-    .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(f => f.ArrivalAirport)
+                .WithMany(a => a.ArrivingFlights)
+                .HasForeignKey(f => f.ArrivalAirportId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // 1. SEED AIRPORTS
             modelBuilder.Entity<Airport>().HasData(

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <Folder Include="DTOs\Validators\" />
   </ItemGroup>
 
   <ItemGroup>
