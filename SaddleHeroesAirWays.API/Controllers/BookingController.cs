@@ -1,12 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SaddleHeroesAirWays.API.Services.Interfaces;
 
 namespace SaddleHeroesAirWays.API.Controllers
 {
-    public class BookingController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class BookingController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IBookingService _bookingService;
+
+        public BookingController(IBookingService bookingService)
         {
-            return View();
+            _bookingService = bookingService;
         }
     }
 }

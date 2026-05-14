@@ -1,6 +1,6 @@
 ﻿namespace SaddleHeroesAirWays.API.Services.Interfaces
 {
-    public interface IFlightServicecs
+    public interface IFlightService
     {
     }
 }

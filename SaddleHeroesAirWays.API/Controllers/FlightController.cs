@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SaddleHeroesAirWays.API.Services.Interfaces;
 
 namespace SaddleHeroesAirWays.API.Controllers
 {
-    public class FlightController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class FlightController(IFlightService flightService) : ControllerBase
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        private readonly IFlightService _flightService = flightService;
     }
 }
