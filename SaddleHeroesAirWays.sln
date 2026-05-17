@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37111.16 d17.14
+VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaddleHeroesAirWays.API", "SaddleHeroesAirWays.API\SaddleHeroesAirWays.API.csproj", "{04691F8F-908D-43C3-81E7-CCE064670770}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaddleHeroesAirWays.MSTest", "SaddleHeroesAirWays.MSTest\SaddleHeroesAirWays.MSTest.csproj", "{2F42B28E-16E3-4922-B4A3-2BDE6F9D3207}"
+	ProjectSection(ProjectDependencies) = postProject
+		{57E5224B-0185-4D37-8E85-E5C7EC9A92C8} = {57E5224B-0185-4D37-8E85-E5C7EC9A92C8}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaddleHeroesAirWays.Library", "SaddleHeroesAirWays.Library\SaddleHeroesAirWays.Library.csproj", "{57E5224B-0185-4D37-8E85-E5C7EC9A92C8}"
 EndProject
