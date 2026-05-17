@@ -1,8 +1,10 @@
 ﻿using SaddleHeroesAirWays.Library.Models;
+using SaddleHeroesAirWays.Library.Services;
 
 namespace SaddleHeroesAirWays.MSTest
 {
-    internal class FlightStatisticsServiceTests
+    [TestClass]
+    public class FlightStatisticsServiceTests
     {
         [TestMethod]
         public void GetFlightsForWeek_ShouldReturnFlightsForSpecificWeek()
@@ -15,7 +17,7 @@ namespace SaddleHeroesAirWays.MSTest
                     new Flight { Id = 3, DepartureTime = new DateTime(2026, 6, 1) }
                 };
 
-            var service = new FlightStatisticsService(flights);
+            var service = new FlightServices(flights);
 
             // Act
             var result = service.GetFlightsForWeek(new DateTime(2026, 5, 12));
