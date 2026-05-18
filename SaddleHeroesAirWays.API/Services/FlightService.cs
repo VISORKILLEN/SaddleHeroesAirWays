@@ -1,28 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SaddleHeroesAirWays.Library.Models;
+﻿using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.API.Services
 {
     public class FlightService
     {
-        private readonly DbContextAPI _context;
+        private readonly List<Flight> _flights;
 
-        public FlightService(DbContextAPI context)
+        public FlightService(List<Flight> flights)
         {
-            _context = context;
+            _flights = flights;
         }
 
-        public async Task<List<Flight>> GetFlightsForWeekAsync(DateTime date)
+        // This method retrieves all flights that are scheduled to depart within the week of the provided date.
+        public List<Flight> GetFlightsForWeek(DateTime date)
         {
             int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
 
-            var startOfWeek = date.AddDays(-diff).Date;
+            var startOfWeek = date.AddDays(-1 * diff).Date;
             var endOfWeek = startOfWeek.AddDays(7);
 
-            return await _context.Flight
+            return _flights
                 .Where(f => f.DepartureTime >= startOfWeek &&
-                            f.DepartureTime < endOfWeek)
-                .ToListAsync();
+                                  f.DepartureTime < endOfWeek)
+                .ToList();
         }
     }
 }

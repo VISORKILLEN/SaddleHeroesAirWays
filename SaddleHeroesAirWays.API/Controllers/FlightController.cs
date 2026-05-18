@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SaddleHeroesAirWays.API.Services.Interfaces;
+using SaddleHeroesAirWays.API.Services;
 
 namespace SaddleHeroesAirWays.API.Controllers
 {
@@ -10,9 +11,9 @@ namespace SaddleHeroesAirWays.API.Controllers
         private readonly IFlightService _flightService = flightService;
 
         [HttpGet("weekly")]
-        public async Task<IActionResult> GetWeeklyFlights(DateTime date)
+        public IActionResult GetWeeklyFlights(DateTime date)
         {
-            var flights = await _flightService.GetFlightsForWeekAsync(date);
+            var flights = _flightService.GetFlightsForWeek(date);
 
             return Ok(flights);
         }
