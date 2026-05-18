@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services;
-using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.API.Controllers
@@ -11,17 +11,27 @@ namespace SaddleHeroesAirWays.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IValidator<CreateUser> _validator;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService IuserService, IValidator<CreateUser> validator)
         {
-            _userService = userService;
+            _userService = IuserService;
+            _validator = validator;
         }
 
-        [HttpPost("/CreateUser")]
-        public async Task<ActionResult<IEnumerable<CreateUser>>> GetAllPersons(int id, string FirstName, string LastName, string Gender, string Email, string PhoneNumber, string SocialSecurityNumber, bool IsAdmin)
+        [HttpPost("CreateUser")]
+        public async Task<ActionResult<User>> CreateUser([FromBody] CreateUser request)
         {
-            User NewUser = new User { Id = id, Firstname = FirstName, Lastname = LastName, Gender = Gender, Email = Email, Phonenumber = PhoneNumber, SocialSecurityNumber = SocialSecurityNumber, IsAdmin = IsAdmin};
-            return Ok(NewUser);
+            var validationResult = await _validator.ValidateAsync(request);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.ToDictionary());
+            }
+
+            User newUser = await _userService.CreateUserAsync(request);
+
+            return Ok(newUser);
         }
     }
 }
