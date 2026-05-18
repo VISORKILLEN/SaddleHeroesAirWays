@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SaddleHeroesAirWays.API\SaddleHeroesAirWays.API.csproj" />
     <ProjectReference Include="..\SaddleHeroesAirWays.Library\SaddleHeroesAirWays.Library.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,5 @@
 ﻿using SaddleHeroesAirWays.Library.Models;
-using SaddleHeroesAirWays.Library.Services;
+using SaddleHeroesAirWays.API.Services;
 
 namespace SaddleHeroesAirWays.MSTest
 {
@@ -17,7 +17,7 @@ namespace SaddleHeroesAirWays.MSTest
                     new Flight { Id = 3, DepartureTime = new DateTime(2026, 6, 1) }
                 };
 
-            var service = new FlightServices(flights);
+            var service = new FlightService(flights);
 
             // Act
             var result = service.GetFlightsForWeek(new DateTime(2026, 5, 12));
