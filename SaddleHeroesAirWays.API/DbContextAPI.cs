@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.API
@@ -108,6 +109,9 @@ namespace SaddleHeroesAirWays.API
             );
         }
 
-
+        internal async Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
