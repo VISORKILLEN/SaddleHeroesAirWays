@@ -26,11 +26,16 @@ namespace SaddleHeroesAirWays.API.Controllers
 
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.ToDictionary());
+                var errors = validationResult.Errors.Select(error => new
+                {
+                    field = error.PropertyName,
+                    message = error.ErrorMessage
+                });
+
+                return BadRequest(errors);
             }
 
             User newUser = await _userService.CreateUserAsync(userRequest);
-
             return Ok(newUser);
         }
     }
