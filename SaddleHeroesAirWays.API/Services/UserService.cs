@@ -7,7 +7,7 @@ namespace SaddleHeroesAirWays.API.Services
     {
         Task<User> CreateUserAsync(CreateUser request);
     }
-    public class UserService : IUserService
+  public class UserService : IUserService
     {
         public async Task<User> CreateUserAsync(CreateUser request)
         {
@@ -19,7 +19,7 @@ namespace SaddleHeroesAirWays.API.Services
                 Email = request.Email,
                 Phonenumber = request.Phonenumber,
                 SocialSecurityNumber = request.SocialSecurityNumber,
-                IsAdmin = false
+                IsAdmin = false                             
             };
 
             await Task.CompletedTask;
