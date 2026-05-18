@@ -12,9 +12,15 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUser>
         RuleFor(x => x.Lastname)
             .NotEmpty().WithMessage("Last name is required.");
 
+        RuleFor(x => x.Gender)
+            .NotEmpty().WithMessage("Gender is required");
+
         RuleFor(x => x.Email)
             .NotEmpty()
             .EmailAddress().WithMessage("A valid email is required.");
+
+        RuleFor(x => x.Phonenumber)
+            .NotEmpty().WithMessage("a phonenumber is required");
 
         RuleFor(x => x.SocialSecurityNumber)
             .NotEmpty()
