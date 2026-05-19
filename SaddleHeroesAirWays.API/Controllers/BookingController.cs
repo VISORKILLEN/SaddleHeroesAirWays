@@ -5,13 +5,16 @@ namespace SaddleHeroesAirWays.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BookingController : ControllerBase
+    public class BookingController(IBookingService bookingService) : ControllerBase
     {
-        private readonly IBookingService _bookingService;
+        private readonly IBookingService _bookingService = bookingService;
 
-        public BookingController(IBookingService bookingService)
+        [HttpGet("monthly")]
+        public async Task<IActionResult> GetMonthlyBookings(DateTime date)
         {
-            _bookingService = bookingService;
+            var bookings = await _bookingService.GetBookingsForMonthAsync(date);
+
+            return Ok(bookings);
         }
     }
 }
