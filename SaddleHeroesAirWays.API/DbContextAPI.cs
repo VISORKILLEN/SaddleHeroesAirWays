@@ -109,9 +109,5 @@ namespace SaddleHeroesAirWays.API
             );
         }
 
-        internal async Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(int userId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
