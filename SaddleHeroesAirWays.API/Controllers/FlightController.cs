@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SaddleHeroesAirWays.API.Services.Interfaces;
-using SaddleHeroesAirWays.API.Services;
 
 namespace SaddleHeroesAirWays.API.Controllers
 {
