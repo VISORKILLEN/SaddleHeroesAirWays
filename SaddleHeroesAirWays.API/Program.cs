@@ -48,3 +48,4 @@ namespace SaddleHeroesAirWays.API
         }
     }
 }
+public partial class Program { }

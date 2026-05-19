@@ -5,9 +5,8 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
 {
     public interface IBookingService
     {
-        Task<List<Booking>> GetBookingsForMonthAsync(DateTime date);
-
-        Task<List<Booking>> GetBookingsForWeekAsync(DateTime date);
+        Task<IEnumerable<BookingResponse>> GetBookingsForWeekAsync(DateTime date);
+        Task<IEnumerable<BookingResponse>> GetBookingsForMonthAsync(DateTime date);
         Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(int userId);
     }
 }
