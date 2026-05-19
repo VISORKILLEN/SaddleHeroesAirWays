@@ -1,12 +1,9 @@
 ﻿using SaddleHeroesAirWays.API.DTOs;
+using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.API.Services
 {
-    public interface IUserService
-    {
-        Task<User> CreateUserAsync(CreateUser request);
-    }
   public class UserService : IUserService
     {
         public async Task<User> CreateUserAsync(CreateUser request)
