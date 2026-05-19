@@ -12,18 +12,16 @@ namespace SaddleHeroesAirWays.API.Controllers
 
         // Get bookings for a specific week based on the provided date
         [HttpGet("weekly")]
-        public async Task<IActionResult> GetWeeklyBookings(DateTime date)
+        public async Task<ActionResult<List<BookingResponse>>> GetWeeklyBookings(DateTime date)
         {
             var bookings = await _bookingService.GetBookingsForWeekAsync(date);
-
             return Ok(bookings);
         }
-        // Get bookings for a specific month based on the provided date
+
         [HttpGet("monthly")]
-        public async Task<IActionResult> GetMonthlyBookings(DateTime date)
+        public async Task<ActionResult<List<BookingResponse>>> GetMonthlyBookings(DateTime date)
         {
             var bookings = await _bookingService.GetBookingsForMonthAsync(date);
-
             return Ok(bookings);
         }
 
