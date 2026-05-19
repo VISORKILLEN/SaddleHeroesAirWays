@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SaddleHeroesAirWays.API;
 
@@ -11,9 +12,11 @@ using SaddleHeroesAirWays.API;
 namespace SaddleHeroesAirWays.API.Migrations
 {
     [DbContext(typeof(DbContextAPI))]
-    partial class DbContextAPIModelSnapshot : ModelSnapshot
+    [Migration("20260519124118_addedforeignkey")]
+    partial class addedforeignkey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
