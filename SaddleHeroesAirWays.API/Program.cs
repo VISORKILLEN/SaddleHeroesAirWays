@@ -3,7 +3,10 @@ using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using SaddleHeroesAirWays.API;
+using SaddleHeroesAirWays.API.Services;
+using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
+using FluentValidation;
 
 namespace SaddleHeroesAirWays.API
 {
@@ -19,13 +22,16 @@ namespace SaddleHeroesAirWays.API
 
             builder.Services.AddDbContext<DbContextAPI>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddScoped<IUserService, UserService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSingleton(new List<Flight>());
             builder.Services.AddScoped<IFlightService, FlightService>();
             
             //test
+            builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

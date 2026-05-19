@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services;
-using SaddleHeroesAirWays.API.Services.Interfaces;
+using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.API.Controllers
 {
@@ -9,10 +11,32 @@ namespace SaddleHeroesAirWays.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IValidator<CreateUser> _validator;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService IuserService, IValidator<CreateUser> validator)
         {
-            _userService = userService;
+            _userService = IuserService;
+            _validator = validator;
+        }
+
+        [HttpPost("CreateUser")]
+        public async Task<ActionResult<User>> CreateUser(CreateUser userRequest)
+        {
+            var validationResult = await _validator.ValidateAsync(userRequest);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(error => new
+                {
+                    field = error.PropertyName,
+                    message = error.ErrorMessage
+                });
+
+                return BadRequest(errors);
+            }
+
+            User newUser = await _userService.CreateUserAsync(userRequest);
+            return Ok(newUser);
         }
     }
 }
