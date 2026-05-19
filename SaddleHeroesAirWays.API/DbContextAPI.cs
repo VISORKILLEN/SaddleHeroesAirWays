@@ -38,6 +38,11 @@ namespace SaddleHeroesAirWays.API
                 .HasForeignKey(f => f.ArrivalAirportId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<BookingDetails>()
+                .HasOne(bd => bd.Booking)
+                .WithMany(b => b.BookingDetails)
+                .HasForeignKey(bd => bd.BookingReference);
+
             // 1. SEED AIRPORTS
             modelBuilder.Entity<Airport>().HasData(
                 new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },

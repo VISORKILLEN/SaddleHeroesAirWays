@@ -84,7 +84,12 @@ namespace SaddleHeroesAirWays.API.Services
                     b.BookingDate,
                     b.TotalPrice,
                     b.BookingStatus.ToString(),
-                    null
+                    b.BookingDetails.Select(bd => new BookingDetailsResponse(
+                        bd.Id, 
+                        bd.Seatnumber,
+                        bd.Baggage,
+                        bd.Notes
+                        ))
                 ))
                 .ToListAsync();
         }
