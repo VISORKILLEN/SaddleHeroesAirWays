@@ -5,6 +5,7 @@ using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
 using FluentValidation;
+using IUserService = SaddleHeroesAirWays.API.Services.IUserService;
 
 namespace SaddleHeroesAirWays.API
 {

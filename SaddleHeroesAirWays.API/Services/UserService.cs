@@ -3,12 +3,12 @@ using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.API.Services
 {
-    public interface IUserService
+    public interface IUserService // Move to interface folder
     {
         Task<User> CreateUserAsync(CreateUser request);
     }
   public class UserService : IUserService
-    {
+    { // Task<User> can maybe be changed to branch
         public async Task<User> CreateUserAsync(CreateUser request)
         {
             var newUser = new User
