@@ -25,5 +25,17 @@ namespace SaddleHeroesAirWays.API.Services
                             f.DepartureTime < endOfWeek)
                 .ToList();
         }
+
+        public async Task<List<Flight>> GetFlightsForMonthAsync(DateTime date)
+        {
+            var startOfMonth = new DateTime(date.Year, date.Month, 1);
+
+            var endOfMonth = startOfMonth.AddMonths(1);
+
+            return await _context.Flight
+                .Where(f => f.DepartureTime >= startOfMonth &&
+                            f.DepartureTime < endOfMonth)
+                .ToListAsync();
+        }
     }
 }
