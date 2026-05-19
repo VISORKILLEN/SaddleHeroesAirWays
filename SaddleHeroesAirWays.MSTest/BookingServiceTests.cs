@@ -33,7 +33,7 @@ namespace SaddleHeroesAirWays.MSTest
             var service = new BookingService(context);
             var result = await service.GetBookingsForWeekAsync(new DateTime(2026, 5, 12));
 
-            Assert.AreEqual(2, result.Count); // B1 (11 maj) och B2 (13 maj) ska returneras
+            Assert.AreEqual(2, result.Count()); // B1 (11 maj) och B2 (13 maj) ska returneras
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace SaddleHeroesAirWays.MSTest
             var service = new BookingService(context);
             var result = await service.GetBookingsForMonthAsync(new DateTime(2026, 6, 10));
 
-            Assert.AreEqual(2, result.Count); // B1 (1 juni) och B2 (15 juni) ska returneras
+            Assert.AreEqual(2, result.Count()); // B1 (1 juni) och B2 (15 juni) ska returneras
         }
     }
 }
