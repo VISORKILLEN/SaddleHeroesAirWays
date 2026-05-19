@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 
 namespace SaddleHeroesAirWays.API.Controllers
@@ -24,6 +25,19 @@ namespace SaddleHeroesAirWays.API.Controllers
             var bookings = await _bookingService.GetBookingsForMonthAsync(date);
 
             return Ok(bookings);
+        }
+
+        [HttpGet("{id}", Name = "GetBookingsById")]
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingsByUserId(int id)
+        {
+            var booking = await _bookingService.GetBookingsByUserIdAsync(id);
+
+            if (!booking.Any())
+            {
+                return NotFound($"Användare med id {id} har inga bokningar.");
+            }
+
+            return Ok(booking);
         }
     }
 }
