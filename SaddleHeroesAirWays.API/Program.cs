@@ -25,8 +25,6 @@ namespace SaddleHeroesAirWays.API
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton(new List<Flight>());
-            builder.Services.AddScoped<IFlightService, FlightService>();
             
             //test
             builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
