@@ -13,6 +13,19 @@ namespace SaddleHeroesAirWays.API.Services
             _context = context;
         }
 
+        public async Task<List<Booking>> GetBookingsForWeekAsync(DateTime date)
+        {
+            int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+
+            var startOfWeek = date.AddDays(-diff).Date;
+            var endOfWeek = startOfWeek.AddDays(7);
+
+            return await _context.Booking
+                .Where(b => b.BookingDate >= startOfWeek &&
+                            b.BookingDate < endOfWeek)
+                .ToListAsync();
+        }
+
         public async Task<List<Booking>> GetBookingsForMonthAsync(DateTime date)
         {
             var startOfMonth = new DateTime(date.Year, date.Month, 1);
