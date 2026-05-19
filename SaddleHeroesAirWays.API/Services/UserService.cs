@@ -19,6 +19,7 @@ namespace SaddleHeroesAirWays.API.Services
                 IsAdmin = false                             
             };
 
+
             await Task.CompletedTask;
 
             return newUser;
