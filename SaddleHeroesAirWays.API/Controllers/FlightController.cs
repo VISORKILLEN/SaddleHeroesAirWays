@@ -8,5 +8,13 @@ namespace SaddleHeroesAirWays.API.Controllers
     public class FlightController(IFlightService flightService) : ControllerBase
     {
         private readonly IFlightService _flightService = flightService;
+
+        [HttpGet("weekly")]
+        public IActionResult GetWeeklyFlights(DateTime date)
+        {
+            var flights = _flightService.GetFlightsForWeek(date);
+
+            return Ok(flights);
+        }
     }
 }

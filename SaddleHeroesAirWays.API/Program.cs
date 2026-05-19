@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using SaddleHeroesAirWays.API.Services;
+using SaddleHeroesAirWays.API.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using SaddleHeroesAirWays.API;
 using SaddleHeroesAirWays.API.Services;
@@ -17,6 +19,7 @@ namespace SaddleHeroesAirWays.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+
             builder.Services.AddDbContext<DbContextAPI>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IUserService, UserService>();
@@ -24,6 +27,10 @@ namespace SaddleHeroesAirWays.API
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSingleton(new List<Flight>());
+            builder.Services.AddScoped<IFlightService, FlightService>();
+            
+            //test
             builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
             var app = builder.Build();
 
