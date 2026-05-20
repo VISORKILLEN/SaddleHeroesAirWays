@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Routing.Matching;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using SaddleHeroesAirWays.API;
 using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.Library.Models;
@@ -64,7 +66,7 @@ namespace SaddleHeroesAirWays.MSTest
 
         //Happy path test - return the bookings of indicated id
         [TestMethod]
-        public async Task GetBookingsByUserIdAsync_EnterUserIdAndGetTheirBookings_ReturnBookings()
+        public async Task GetBookingsByUserId_EnterUserIdAndGetTheirBookings_ReturnBookings()
         {
             var options = new DbContextOptionsBuilder<DbContextAPI>()
                .UseInMemoryDatabase(databaseName: "BookingsById")
@@ -85,14 +87,14 @@ namespace SaddleHeroesAirWays.MSTest
             context.SaveChanges();
 
             var service = new BookingService(context);
-            var result = await service.GetBookingsByUserIdAsync(userId: (1));
+            var actual = await service.GetBookingsByUserIdAsync(userId: (1));
 
-            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(1, actual.Count());
         }
 
         //Happy path test - returns the first booking including bookingdetails
         [TestMethod]
-        public async Task GetBookingsByUserIdAsync_EnterUserIdAndGetTheirBookingsWithBookingDetails_ReturnBookingsWithBookingDetails()
+        public async Task GetBookingsByUserId_EnterUserIdAndGetTheirBookingsWithBookingDetails_ReturnBookingsWithBookingDetails()
         {
             var options = new DbContextOptionsBuilder<DbContextAPI>()
                .UseInMemoryDatabase(databaseName: "BookingsById")
@@ -118,10 +120,26 @@ namespace SaddleHeroesAirWays.MSTest
             context.SaveChanges();
 
             var service = new BookingService(context);
-            var result = await service.GetBookingsByUserIdAsync(userId: (1));
-            var firstBooking = result.First();
+            var actual = await service.GetBookingsByUserIdAsync(userId: (1));
+            var firstBooking = actual.First();
 
             Assert.AreEqual(1, firstBooking.Details.Count());
-        }   
+        }
+
+        //Edge case test - verifies that an empty list returns if user dont have any bookings
+        [TestMethod]
+        public async Task GetBookingsByUserId_UserHasNoBookings_ReturnEmpty()
+        {
+            var options = new DbContextOptionsBuilder<DbContextAPI>()
+                .UseInMemoryDatabase(databaseName: "NoBookingsTest")
+                .Options;
+
+            using var context = new DbContextAPI(options);
+
+            var service = new BookingService(context);
+            var actual = await service.GetBookingsByUserIdAsync(userId: 1);
+
+            Assert.AreEqual(0, actual.Count());
+        }
     }
 }
