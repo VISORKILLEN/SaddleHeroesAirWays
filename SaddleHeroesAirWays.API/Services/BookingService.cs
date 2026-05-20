@@ -21,9 +21,6 @@ namespace SaddleHeroesAirWays.API.Services
             var endOfWeek = startOfWeek.AddDays(7);
 
             return await _context.Booking
-                .Include(b => b.Flight).ThenInclude(f => f.DepartureAirport)
-                .Include(b => b.Flight).ThenInclude(f => f.ArrivalAirport)
-                .Include(b => b.User)
                 .Where(b => b.Flight.DepartureTime >= startOfWeek &&
                             b.Flight.DepartureTime < endOfWeek)
                 .Select(b => new BookingResponse(
@@ -37,7 +34,12 @@ namespace SaddleHeroesAirWays.API.Services
                     b.BookingDate,
                     b.TotalPrice,
                     b.BookingStatus.ToString(),
-                    null
+                    b.BookingDetails.Select(bd => new BookingDetailsResponse(
+                        bd.Id,
+                        bd.Seatnumber,
+                        bd.Baggage,
+                        bd.Notes
+                        ))
                 ))
                 .ToListAsync();
         }
@@ -48,9 +50,6 @@ namespace SaddleHeroesAirWays.API.Services
             var endOfMonth = startOfMonth.AddMonths(1);
 
             return await _context.Booking
-                .Include(b => b.Flight).ThenInclude(f => f.DepartureAirport)
-                .Include(b => b.Flight).ThenInclude(f => f.ArrivalAirport)
-                .Include(b => b.User)
                 .Where(b => b.Flight.DepartureTime >= startOfMonth &&
                             b.Flight.DepartureTime < endOfMonth)
                 .Select(b => new BookingResponse(
@@ -64,7 +63,12 @@ namespace SaddleHeroesAirWays.API.Services
                     b.BookingDate,
                     b.TotalPrice,
                     b.BookingStatus.ToString(),
-                    null
+                    b.BookingDetails.Select(bd => new BookingDetailsResponse(
+                        bd.Id,
+                        bd.Seatnumber,
+                        bd.Baggage,
+                        bd.Notes
+                        ))
                 ))
                 .ToListAsync();
         }
