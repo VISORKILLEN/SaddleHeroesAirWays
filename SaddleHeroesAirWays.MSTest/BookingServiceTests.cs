@@ -61,5 +61,33 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.AreEqual(2, result.Count()); // B1 (1 juni) och B2 (15 juni) ska returneras
         }
+
+        //Happy path test - return the bookings of indicated id
+        [TestMethod]
+        public async Task GetBookingsByUserIdAsync_EnterUserIdAndGetTheirBookings_ReturnBookings()
+        {
+            var options = new DbContextOptionsBuilder<DbContextAPI>()
+               .UseInMemoryDatabase(databaseName: "BookingsById")
+               .Options;
+
+            using var context = new DbContextAPI(options);
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 150, Price = 150m });
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = new DateTime(2026, 5, 1), TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var result = await service.GetBookingsByUserIdAsync(userId: (1));
+
+            Assert.AreEqual(1, result.Count());
+        }
     }
 }
