@@ -10,7 +10,7 @@ using SaddleHeroesAirWays.Library.Models;
 namespace SaddleHeroesAirWays.MSTest
 {
     [TestClass]
-    public class UserControllerTests
+    public class UserServiceTests
     {
         private Mock<IUserService>? _userServiceMock;
         private Mock<IValidator<CreateUser>> _validatorMock = null!;
