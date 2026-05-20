@@ -39,5 +39,12 @@ namespace SaddleHeroesAirWays.API.Controllers
             User newUser = await _userService.CreateUserAsync(userRequest);
             return Ok(newUser);
         }
+
+        [HttpGet("GetUsersInAlphabeticalOrder")]
+        public async Task<IActionResult> GetAllUsersAlphabetical()
+        {
+            var result = await _userService.GetAllUsersAlphabeticlyAsync();
+            return Ok(result);
+        }
     }
 }

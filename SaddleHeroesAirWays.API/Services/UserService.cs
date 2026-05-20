@@ -1,4 +1,5 @@
-﻿using SaddleHeroesAirWays.API.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
 
@@ -6,6 +7,12 @@ namespace SaddleHeroesAirWays.API.Services
 {
   public class UserService : IUserService
     {
+        private readonly DbContextAPI _context;
+
+        public UserService(DbContextAPI context)
+        {
+            _context = context;
+        }
         public async Task<User> CreateUserAsync(CreateUser request)
         {
             var newUser = new User
@@ -19,9 +26,16 @@ namespace SaddleHeroesAirWays.API.Services
                 IsAdmin = false                             
             };
 
-            await Task.CompletedTask;
-
             return newUser;
+        }
+
+        public async Task<List<User>> GetAllUsersAlphabeticlyAsync()
+        {
+            var users = await _context.User
+                .OrderBy(u => u.Lastname)
+                .ToListAsync();
+
+            return users;
         }
     }
 }
