@@ -25,8 +25,8 @@ namespace SaddleHeroesAirWays.MSTest
             using var context = CreateContext("BookingWeekTest");
 
             context.Airport.AddRange(
-                new Airport { Id = 1, Name = "Göteborg" },
-                new Airport { Id = 2, Name = "Stockholm" }
+                new Airport { Id = 1, Name = "Göteborg", IATACode = "GOT" },
+                new Airport { Id = 2, Name = "Stockholm", IATACode = "ARN" }
             );
             context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
             context.Flight.AddRange(
@@ -53,8 +53,8 @@ namespace SaddleHeroesAirWays.MSTest
             using var context = CreateContext("BookingMonthTest");
 
             context.Airport.AddRange(
-                new Airport { Id = 1, Name = "Göteborg" },
-                new Airport { Id = 2, Name = "Stockholm" }
+                new Airport { Id = 1, Name = "Göteborg",IATACode = "GOT" },
+                new Airport { Id = 2, Name = "Stockholm", IATACode = "ARN" }
             );
             context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
             context.Flight.AddRange(
