@@ -55,7 +55,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
-        //Happy path test - 
+        //Happy path test - returning OK with correct data
         [TestMethod]
         public async Task GetBookingsByUserId_ValidUserId_ReturnsOk()
         {
