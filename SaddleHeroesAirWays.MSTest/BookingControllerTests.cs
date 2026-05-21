@@ -55,22 +55,40 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
+        //Happy path test - 
         [TestMethod]
         public async Task GetBookingsByUserId_ValidUserId_ReturnsOk()
         {
             var userId = 1;
             _mockBookingService
                 .Setup(s => s.GetBookingsByUserIdAsync(userId))
-                .ReturnsAsync(new List<BookingResponse>
-                {
+                .ReturnsAsync(
+                [
                     new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 5, 1), 150m, "Confirmed", null)
-                });
+                ]);
 
             var actual = await _controller.GetBookingsByUserId(userId);
 
             var okResult = actual.Result as OkObjectResult;
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
+        }
+
+        //Edge case test - empty list returns notfound
+        [TestMethod]
+        public async Task GetBookingsByUserId_UserHasNoBookings_ReturnsNotFound()
+        {
+            var userId = 99;
+            _mockBookingService
+                .Setup(s => s.GetBookingsByUserIdAsync(userId))
+                .ReturnsAsync([]);
+
+            var actual = await _controller.GetBookingsByUserId(userId);
+
+            var notFound = actual.Result as NotFoundObjectResult;
+
+            Assert.IsNotNull(notFound);
+            Assert.AreEqual(404, notFound.StatusCode);
         }
     }
 }
