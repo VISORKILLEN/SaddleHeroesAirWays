@@ -90,5 +90,19 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(notFound);
             Assert.AreEqual(404, notFound.StatusCode);
         }
+
+        //Edge case test - negative userId returns badrequest
+        [TestMethod]
+        public async Task GetBookingsByUserId_InvalidUserId_ReturnsBadRequest()
+        {
+            var userId = -1;
+
+            var actual = await _controller.GetBookingsByUserId(userId);
+
+            var badRequest = actual.Result as BadRequestObjectResult;
+
+            Assert.IsNotNull(badRequest);
+            Assert.AreEqual(400, badRequest.StatusCode);
+        }
     }
 }
