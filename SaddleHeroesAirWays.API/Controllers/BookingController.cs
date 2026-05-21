@@ -28,6 +28,11 @@ namespace SaddleHeroesAirWays.API.Controllers
         [HttpGet("{id}", Name = "GetBookingsById")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingsByUserId(int id)
         {
+            if(id <= 0)
+            {
+                return BadRequest("Ogiltigt användar-Id.");
+            }
+
             var booking = await _bookingService.GetBookingsByUserIdAsync(id);
 
             if (!booking.Any())
