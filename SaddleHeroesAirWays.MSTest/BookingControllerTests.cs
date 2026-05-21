@@ -104,5 +104,22 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(badRequest);
             Assert.AreEqual(400, badRequest.StatusCode);
         }
+
+        //Edge case - verifies that controller returns the service once
+        [TestMethod]
+        public async Task GetBookingsByUserId_ValidUserId_VerifyServiceCalledOnce()
+        {
+            var userId = 1;
+            _mockBookingService
+                .Setup(s => s.GetBookingsByUserIdAsync(userId))
+                .ReturnsAsync(
+                [
+                    new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 5, 1), 150m, "Confirmed", null)
+                ]);
+
+            await _controller.GetBookingsByUserId(userId);
+
+            _mockBookingService.Verify(s => s.GetBookingsByUserIdAsync(userId), Times.Once);
+        }
     }
 }
