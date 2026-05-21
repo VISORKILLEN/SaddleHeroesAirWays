@@ -32,5 +32,8 @@ namespace SaddleHeroesAirWays.MSTest
             // Assert
             Assert.IsTrue(response.IsSuccessStatusCode);
         }
+
+        [TestMethod]
+        public async Task GetBookingsByUserIdAsync__ReturnsSuccess
     }
 }
