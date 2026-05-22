@@ -98,5 +98,10 @@ namespace SaddleHeroesAirWays.API.Services
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<BookingResponse>> GetAllBookingsMade(DateTime date)
+        {
+
+        }
+
     }
 }
