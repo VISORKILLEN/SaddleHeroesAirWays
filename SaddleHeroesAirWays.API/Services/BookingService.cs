@@ -9,6 +9,7 @@ namespace SaddleHeroesAirWays.API.Services
     {
         private readonly DbContextAPI _context;
 
+
         public BookingService(DbContextAPI context)
         {
             _context = context;
@@ -107,6 +108,11 @@ namespace SaddleHeroesAirWays.API.Services
                 return null;
             }
 
+            if(await IsFlightFullAsync(bookingRequest.FlightId, flight.TotalSeats))
+            {
+                return null;
+            }
+
             var count = await _context.Booking.CountAsync();
             
             var bookingToAdd = new Booking
@@ -121,6 +127,26 @@ namespace SaddleHeroesAirWays.API.Services
 
             await _context.AddAsync(bookingToAdd);
             await _context.SaveChangesAsync();
+
+            if(bookingRequest.Details != null && bookingRequest.Details.Any())
+            {
+                var detailsList = new List<BookingDetails>();
+
+                foreach (var d in bookingRequest.Details)
+                {
+                    detailsList.Add(new BookingDetails
+                    {
+                        BookingReference = bookingToAdd.BookingReference,
+                        Seatnumber = await GenerateSeatNumberAsync(bookingRequest.FlightId),
+                        Baggage = d.Baggage,
+                        Notes = d.Notes
+
+                    });
+                }
+                
+                await _context.BookingDetails.AddRangeAsync(detailsList);
+                await _context.SaveChangesAsync();
+            };
 
             var createdBooking = await _context.Booking
                 .Where(b => b.BookingReference == bookingToAdd.BookingReference)
@@ -145,6 +171,34 @@ namespace SaddleHeroesAirWays.API.Services
                 .FirstOrDefaultAsync();
 
             return createdBooking;
+        }
+
+        private async Task<bool> IsFlightFullAsync(int flightId, int totalSeats)
+        {
+            var takenSeats = await _context.BookingDetails
+                .Where(bd => bd.Booking.FlightId == flightId)
+                .CountAsync();
+
+            return takenSeats >= totalSeats;
+        }
+
+        private async Task<string> GenerateSeatNumberAsync(int flightId)
+        {
+            var takenSeats = await _context.BookingDetails
+                .Where(bd => bd.Booking.FlightId == flightId)
+                .Select(bd => bd.Seatnumber)
+                .ToListAsync();
+
+            var rows = Enumerable.Range(1,30);
+            var cols = new[] { "A", "B", "C", "D", "E", "F" };
+
+            var allSeats = rows
+                .SelectMany(r => cols.Select(c => $"{r}{c}"))
+                .ToList();
+
+            var availbleSeats = allSeats.Except(takenSeats).ToList();
+            var random = new Random();
+            return availbleSeats[random.Next(availbleSeats.Count)];
         }
 
     }
