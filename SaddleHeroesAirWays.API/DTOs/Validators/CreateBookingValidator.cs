@@ -10,7 +10,7 @@ namespace SaddleHeroesAirWays.API.DTOs.Validators
                 .GreaterThan(0).WithMessage("UserId måste vara ett positivt tal.");
 
             RuleFor(x => x.FlightId)
-                .GreaterThan(0).WithMessage("FlightId måste vara ett positivt tal.")
+                .GreaterThan(0).WithMessage("FlightId måste vara ett positivt tal.");
         }
     }
 }
