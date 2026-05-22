@@ -25,6 +25,13 @@ namespace SaddleHeroesAirWays.API.Controllers
             return Ok(bookings);
         }
 
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<BookingResponse>>> GetAllBookings()
+        {
+            var bookings = await _bookingService.GetAllBookingsMadeAsync();
+            return Ok(bookings);
+        }
+
         [HttpGet("{id}", Name = "GetBookingsById")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingsByUserId(int id)
         {
