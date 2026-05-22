@@ -8,6 +8,6 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
         Task<IEnumerable<BookingResponse>> GetBookingsForWeekAsync(DateTime date);
         Task<IEnumerable<BookingResponse>> GetBookingsForMonthAsync(DateTime date);
         Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(int userId);
-        Task<IEnumerable<BookingResponse>> GetAllBookings(DateTime Date);
+        Task<IEnumerable<BookingResponse>> GetAllBookingsMadeAsync();
     }
 }
