@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 
@@ -6,9 +7,10 @@ namespace SaddleHeroesAirWays.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BookingController(IBookingService bookingService) : ControllerBase
+    public class BookingController(IBookingService bookingService, IValidator<CreateBookingRequest> createBookingValidator) : ControllerBase
     {
         private readonly IBookingService _bookingService = bookingService;
+        private readonly IValidator<CreateBookingRequest> _createBookingValidator = createBookingValidator;
 
         // Get bookings for a specific week based on the provided date
         [HttpGet("weekly")]
@@ -41,6 +43,31 @@ namespace SaddleHeroesAirWays.API.Controllers
             }
 
             return Ok(booking);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BookingResponse>> CreateBooking(CreateBookingRequest bookingRequest)
+        {
+            var validationResult = await _createBookingValidator.ValidateAsync(bookingRequest);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => new
+                {
+                    field = e.PropertyName,
+                    message = e.ErrorMessage
+                });
+
+                return BadRequest(errors);
+            }
+
+            var result = await _bookingService.CreateBookingAsync(bookingRequest);
+            if (result == null)
+            {
+                return BadRequest("Flyget hittades inte.");
+            }
+
+            return Created(string.Empty,result);
         }
     }
 }
