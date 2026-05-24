@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.EntityFrameworkCore;
 using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
@@ -25,6 +26,9 @@ namespace SaddleHeroesAirWays.API.Services
                 SocialSecurityNumber = request.SocialSecurityNumber,
                 IsAdmin = false                             
             };
+
+            await _context.User.AddAsync(newUser);
+            await _context.SaveChangesAsync();
 
             return newUser;
         }
