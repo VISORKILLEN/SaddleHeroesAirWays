@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SaddleHeroesAirWays.API.Controllers;
 using SaddleHeroesAirWays.API.DTOs;
@@ -10,12 +11,14 @@ namespace SaddleHeroesAirWays.MSTest
     public class BookingControllerUnitTests
     {
         private readonly Mock<IBookingService> _mockBookingService;
+        private readonly Mock<IValidator<CreateBookingRequest>> _mockValidator;
         private readonly BookingController _controller;
 
         public BookingControllerUnitTests()
         {
             _mockBookingService = new Mock<IBookingService>();
-            _controller = new BookingController(_mockBookingService.Object);
+            _mockValidator = new Mock<IValidator<CreateBookingRequest>>();
+            _controller = new BookingController(_mockBookingService.Object, _mockValidator.Object);
         }
 
         // Happy path test - verifies that the controller returns OK for weekly bookings
