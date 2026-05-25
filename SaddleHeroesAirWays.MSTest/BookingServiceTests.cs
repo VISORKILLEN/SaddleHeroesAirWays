@@ -82,11 +82,7 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task GetBookingsByUserId_EnterUserIdAndGetTheirBookings_ReturnBookings()
         {
-            var options = new DbContextOptionsBuilder<DbContextAPI>()
-               .UseInMemoryDatabase(databaseName: "BookingsById")
-               .Options;
-
-            using var context = new DbContextAPI(options);
+            using var context = CreateContext("BookingsByIdOne");
 
             context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
 
@@ -110,11 +106,7 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task GetBookingsByUserId_EnterUserIdAndGetTheirBookingsWithBookingDetails_ReturnBookingsWithBookingDetails()
         {
-            var options = new DbContextOptionsBuilder<DbContextAPI>()
-               .UseInMemoryDatabase(databaseName: "BookingsById")
-               .Options;
-
-            using var context = new DbContextAPI(options);
+            using var context = CreateContext("BookingsByIdTwo");
 
             context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
 
@@ -148,11 +140,7 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task GetBookingsByUserId_UserHasNoBookings_ReturnEmpty()
         {
-            var options = new DbContextOptionsBuilder<DbContextAPI>()
-                .UseInMemoryDatabase(databaseName: "NoBookingsTest")
-                .Options;
-
-            using var context = new DbContextAPI(options);
+            using var context = CreateContext("BookingsByIdThree");
 
             var service = new BookingService(context);
             var actual = await service.GetBookingsByUserIdAsync(userId: 1);
@@ -164,11 +152,7 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task GetBookingsByUserId_ValidUserId_ReturnCorrectlyMappedData()
         {
-            var options = new DbContextOptionsBuilder<DbContextAPI>()
-               .UseInMemoryDatabase(databaseName: "BookingsById")
-               .Options;
-
-            using var context = new DbContextAPI(options);
+            using var context = CreateContext("BookingsByIdFour");
 
             context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
 

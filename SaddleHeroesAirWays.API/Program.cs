@@ -1,10 +1,12 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using SaddleHeroesAirWays.API.Services;
-using SaddleHeroesAirWays.API.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using SaddleHeroesAirWays.API;
+using SaddleHeroesAirWays.API.DTOs;
+using SaddleHeroesAirWays.API.DTOs.Validators;
+using SaddleHeroesAirWays.API.Services;
+using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
-using FluentValidation;
 
 namespace SaddleHeroesAirWays.API
 {
@@ -23,6 +25,7 @@ namespace SaddleHeroesAirWays.API
             builder.Services.AddScoped<IUserService, UserService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingValidator>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             
