@@ -226,5 +226,44 @@ namespace SaddleHeroesAirWays.API.Services
             return availbleSeats[random.Next(availbleSeats.Count)];
         }
 
+        public async Task<BookingResponse> UpdateBookingAsync(string bookingReference, UpdateBooking updateBooking)
+        {
+            var booking = await _context.Booking
+                .FirstOrDefaultAsync(b => b.BookingReference == bookingReference);
+
+            if (booking == null)
+            {
+                return null;
+            }
+
+            booking.FlightId = updateBooking.FlightId ?? booking.FlightId;
+            booking.BookingStatus = BookingStatus.Rebooked;
+
+            await _context.SaveChangesAsync();
+
+            var updatedBooking = await _context.Booking
+                .Where(b => b.BookingReference == bookingReference)
+                .Select(b => new BookingResponse(
+                    b.BookingReference,
+                    b.User.Firstname,
+                    b.User.Lastname,
+                    b.Flight.FlightNumber,
+                    b.Flight.DepartureAirport.Name,
+                    b.Flight.ArrivalAirport.Name,
+                    b.Flight.DepartureTime,
+                    b.BookingDate,
+                    b.TotalPrice,
+                    b.BookingStatus.ToString(),
+                    b.BookingDetails.Select(bd => new BookingDetailsResponse(
+                        bd.Id,
+                        bd.Seatnumber,
+                        bd.Baggage,
+                        bd.Notes
+                        ))
+                ))
+                .FirstOrDefaultAsync();
+
+            return updatedBooking;
+        }
     }
 }

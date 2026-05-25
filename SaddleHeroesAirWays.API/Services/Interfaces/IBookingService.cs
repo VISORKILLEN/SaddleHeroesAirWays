@@ -11,6 +11,6 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
         Task<IEnumerable<BookingResponse>> GetAllBookingsMadeAsync();
 
         Task<BookingResponse> CreateBookingAsync(CreateBookingRequest request);
-        Task<BookingResponse> UpdateBookingAsync(string bookingreference, UpdateBooking updateBooking);
+        Task<BookingResponse> UpdateBookingAsync(string bookingReference, UpdateBooking updateBooking);
     }
 }
