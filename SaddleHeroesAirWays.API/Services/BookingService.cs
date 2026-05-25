@@ -99,7 +99,7 @@ namespace SaddleHeroesAirWays.API.Services
         }
 
         // Get all bookings made
-        public async Task<IEnumerable<BookingResponse>> GetAllBookingsMadeAsync(DateTime date)
+        public async Task<IEnumerable<BookingResponse>> GetAllBookingsMadeAsync()
         {
             return await _context.Booking
                 .Select(b => new BookingResponse(

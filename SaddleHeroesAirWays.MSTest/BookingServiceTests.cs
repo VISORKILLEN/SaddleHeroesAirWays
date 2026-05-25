@@ -19,6 +19,7 @@ namespace SaddleHeroesAirWays.MSTest
             return new DbContextAPI(options);
         }
 
+        //Happy path test - return the bookings of indicated week
         [TestMethod]
         public async Task GetBookingsForWeek_ShouldReturnBookingsForSpecificWeek()
         {
@@ -47,6 +48,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(2, result.Count()); // B1 och B2 ska returneras
         }
 
+        //Happy path test - return the bookings of specific month
         [TestMethod]
         public async Task GetBookingsForMonth_ShouldReturnBookingsForSpecificMonth()
         {
@@ -189,6 +191,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Confirmed", actual.First().BookingStatus);
         }
 
+        //Happy path test - returns all bookings in the system
         [TestMethod]
         public async Task GetAllBookings_ShouldReturnAllBookings()
         {
