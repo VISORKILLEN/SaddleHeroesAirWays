@@ -16,7 +16,7 @@ namespace SaddleHeroesAirWays.MSTest
         {
             // Skapa mock och controller istället för HttpClient
             _mockBookingService = new Mock<IBookingService>();
-            //_controller = new BookingController(_mockBookingService.Object);
+            //_controller = new BookingController(_mockBookingService.Object); //denna ger mig problem så den är temporärt kommenterad
         }
 
         [TestMethod]
