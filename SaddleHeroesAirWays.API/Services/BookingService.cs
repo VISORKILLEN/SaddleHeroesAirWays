@@ -193,7 +193,6 @@ namespace SaddleHeroesAirWays.API.Services
                         bd.Notes
                         ))
                 ))
-                .ToListAsync();
                 .FirstOrDefaultAsync();
 
             return createdBooking;
