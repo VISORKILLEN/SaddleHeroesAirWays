@@ -19,6 +19,7 @@ namespace SaddleHeroesAirWays.MSTest
             return new DbContextAPI(options);
         }
 
+        //Happy path test - return the bookings of indicated week
         [TestMethod]
         public async Task GetBookingsForWeek_ShouldReturnBookingsForSpecificWeek()
         {
@@ -47,13 +48,14 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(2, result.Count()); // B1 och B2 ska returneras
         }
 
+        //Happy path test - return the bookings of specific month
         [TestMethod]
         public async Task GetBookingsForMonth_ShouldReturnBookingsForSpecificMonth()
         {
             using var context = CreateContext("BookingMonthTest");
 
             context.Airport.AddRange(
-                new Airport { Id = 1, Name = "Göteborg",IATACode = "GOT" },
+                new Airport { Id = 1, Name = "Göteborg", IATACode = "GOT" },
                 new Airport { Id = 2, Name = "Stockholm", IATACode = "ARN" }
             );
             context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
@@ -118,7 +120,11 @@ namespace SaddleHeroesAirWays.MSTest
 
             context.BookingDetails.Add(new BookingDetails
             {
-                Id = 1, BookingReference = "BKG-001", Seatnumber = "12A", Baggage = true, Notes = "Vegetarian meal requested"
+                Id = 1,
+                BookingReference = "BKG-001",
+                Seatnumber = "12A",
+                Baggage = true,
+                Notes = "Vegetarian meal requested"
             });
 
             context.SaveChanges();
@@ -167,6 +173,38 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("BKG-001", actual.First().BookingReference);
             Assert.AreEqual("Stockholm Arlanda", actual.First().DepartureAirport);
             Assert.AreEqual("Confirmed", actual.First().BookingStatus);
+        }
+
+        //Happy path test - returns all bookings in the system
+        [TestMethod]
+        public async Task GetAllBookings_ShouldReturnAllBookings()
+        {
+            var options = new DbContextOptionsBuilder<DbContextAPI>()
+                .UseInMemoryDatabase(databaseName: "BookingAllTest")
+                .Options;
+            using var context = new DbContextAPI(options);
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, Name = "Göteborg", IATACode = "GOT" },
+                new Airport { Id = 2, Name = "Stockholm", IATACode = "ARN" }
+            );
+            context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
+            context.Flight.AddRange(
+                new Flight { Id = 1, DepartureTime = new DateTime(2026, 6, 1), FlightNumber = "SH001", DepartureAirportId = 1, ArrivalAirportId = 2 },
+                new Flight { Id = 2, DepartureTime = new DateTime(2026, 6, 15), FlightNumber = "SH002", DepartureAirportId = 1, ArrivalAirportId = 2 },
+                new Flight { Id = 3, DepartureTime = new DateTime(2026, 7, 1), FlightNumber = "SH003", DepartureAirportId = 1, ArrivalAirportId = 2 }
+            );
+            context.Booking.AddRange(
+                new Booking { BookingReference = "B1", FlightId = 1, UserId = 1 },
+                new Booking { BookingReference = "B2", FlightId = 2, UserId = 1 },
+                new Booking { BookingReference = "B3", FlightId = 3, UserId = 1 }
+            );
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var result = await service.GetAllBookingsMadeAsync();
+
+            Assert.AreEqual(3, result.Count());
         }
     }
 }
