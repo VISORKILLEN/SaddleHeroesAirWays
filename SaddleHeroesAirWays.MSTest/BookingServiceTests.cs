@@ -200,16 +200,20 @@ namespace SaddleHeroesAirWays.MSTest
                 .Options;
             using var context = new DbContextAPI(options);
 
-            context.Flight.AddRange(
-                new Flight { Id = 1, DepartureTime = new DateTime(2026, 6, 1) },
-                new Flight { Id = 2, DepartureTime = new DateTime(2026, 6, 2) },
-                new Flight { Id = 3, DepartureTime = new DateTime(2026, 6, 3) }
+            context.Airport.AddRange(
+                new Airport { Id = 1, Name = "Göteborg", IATACode = "GOT" },
+                new Airport { Id = 2, Name = "Stockholm", IATACode = "ARN" }
             );
-
+            context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
+            context.Flight.AddRange(
+                new Flight { Id = 1, DepartureTime = new DateTime(2026, 6, 1), FlightNumber = "SH001", DepartureAirportId = 1, ArrivalAirportId = 2 },
+                new Flight { Id = 2, DepartureTime = new DateTime(2026, 6, 15), FlightNumber = "SH002", DepartureAirportId = 1, ArrivalAirportId = 2 },
+                new Flight { Id = 3, DepartureTime = new DateTime(2026, 7, 1), FlightNumber = "SH003", DepartureAirportId = 1, ArrivalAirportId = 2 }
+            );
             context.Booking.AddRange(
-                new Booking { BookingReference = "B1", FlightId = 1 },
-                new Booking { BookingReference = "B2", FlightId = 2 },
-                new Booking { BookingReference = "B3", FlightId = 3 }
+                new Booking { BookingReference = "B1", FlightId = 1, UserId = 1 },
+                new Booking { BookingReference = "B2", FlightId = 2, UserId = 1 },
+                new Booking { BookingReference = "B3", FlightId = 3, UserId = 1 }
             );
             context.SaveChanges();
 
