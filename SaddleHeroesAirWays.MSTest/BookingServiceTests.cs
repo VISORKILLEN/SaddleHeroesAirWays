@@ -53,7 +53,7 @@ namespace SaddleHeroesAirWays.MSTest
             using var context = CreateContext("BookingMonthTest");
 
             context.Airport.AddRange(
-                new Airport { Id = 1, Name = "Göteborg",IATACode = "GOT" },
+                new Airport { Id = 1, Name = "Göteborg", IATACode = "GOT" },
                 new Airport { Id = 2, Name = "Stockholm", IATACode = "ARN" }
             );
             context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
@@ -126,7 +126,11 @@ namespace SaddleHeroesAirWays.MSTest
 
             context.BookingDetails.Add(new BookingDetails
             {
-                Id = 1, BookingReference = "BKG-001", Seatnumber = "12A", Baggage = true, Notes = "Vegetarian meal requested"
+                Id = 1,
+                BookingReference = "BKG-001",
+                Seatnumber = "12A",
+                Baggage = true,
+                Notes = "Vegetarian meal requested"
             });
 
             context.SaveChanges();
@@ -183,6 +187,33 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("BKG-001", actual.First().BookingReference);
             Assert.AreEqual("Stockholm Arlanda", actual.First().DepartureAirport);
             Assert.AreEqual("Confirmed", actual.First().BookingStatus);
+        }
+
+        [TestMethod]
+        public async Task GetAllBookings_ShouldReturnAllBookings()
+        {
+            var options = new DbContextOptionsBuilder<DbContextAPI>()
+                .UseInMemoryDatabase(databaseName: "BookingAllTest")
+                .Options;
+            using var context = new DbContextAPI(options);
+
+            context.Flight.AddRange(
+                new Flight { Id = 1, DepartureTime = new DateTime(2026, 6, 1) },
+                new Flight { Id = 2, DepartureTime = new DateTime(2026, 6, 2) },
+                new Flight { Id = 3, DepartureTime = new DateTime(2026, 6, 3) }
+            );
+
+            context.Booking.AddRange(
+                new Booking { BookingReference = "B1", FlightId = 1 },
+                new Booking { BookingReference = "B2", FlightId = 2 },
+                new Booking { BookingReference = "B3", FlightId = 3 }
+            );
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var result = await service.GetAllBookingsMadeAsync();
+
+            Assert.AreEqual(3, result.Count());
         }
     }
 }
