@@ -64,5 +64,34 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(returnedUser);
             Assert.AreEqual("19900101-1234", returnedUser.SocialSecurityNumber);
         }
+
+        [TestMethod]
+        public async Task CreateUser_ValidationFailWhenCreate_ReturnsBadRequest()
+        {
+            var badCreateUserRequest = new CreateUser(
+                 Gender: "Male",
+                 Firstname: "John",
+                 Lastname: "Doe",
+                 Email: "",
+                 Phonenumber: "123-456-7890",
+                 SocialSecurityNumber: "19900101-1234"
+            );
+
+            var validationFailures = new List<ValidationFailure>
+            {
+                new ValidationFailure("Email", "Email cannot be empty")
+            };
+
+            _validatorMock
+                .Setup(v => v.ValidateAsync(badCreateUserRequest, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult(validationFailures));
+
+            var result = await _userController.CreateUser(badCreateUserRequest);
+
+            var badRequestResult = result.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult, "Should return 400 Bad Request");
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+
+        }
     }
 }
