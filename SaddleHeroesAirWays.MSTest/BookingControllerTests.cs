@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SaddleHeroesAirWays.API.Controllers;
 using SaddleHeroesAirWays.API.DTOs;
@@ -10,46 +11,43 @@ namespace SaddleHeroesAirWays.MSTest
     public class BookingControllerUnitTests
     {
         private readonly Mock<IBookingService> _mockBookingService;
+        private readonly Mock<IValidator<CreateBookingRequest>> _mockValidator;
         private readonly BookingController _controller;
 
         public BookingControllerUnitTests()
         {
-            // Skapa mock och controller istället för HttpClient
             _mockBookingService = new Mock<IBookingService>();
-            //_controller = new BookingController(_mockBookingService.Object); //denna ger mig problem så den är temporärt kommenterad
+            _mockValidator = new Mock<IValidator<CreateBookingRequest>>();
+            _controller = new BookingController(_mockBookingService.Object, _mockValidator.Object);
         }
 
+        // Happy path test - verifies that the controller returns OK for weekly bookings
         [TestMethod]
         public async Task GetWeeklyBookings_ReturnsOk()
         {
-            // Arrange – bestäm vad mocken ska returnera
             var date = new DateTime(2026, 5, 12);
             _mockBookingService
                 .Setup(s => s.GetBookingsForWeekAsync(date))
                 .ReturnsAsync(new List<BookingResponse>());
 
-            // Act – anropa controllern direkt
             var result = await _controller.GetWeeklyBookings(date);
 
-            // Assert – kontrollera att svaret är 200 OK
             var okResult = result.Result as OkObjectResult;
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
+        // Happy path test - verifies that the controller returns OK for monthly bookings
         [TestMethod]
         public async Task GetMonthlyBookings_ReturnsOk()
         {
-            // Arrange – bestäm vad mocken ska returnera
             var date = new DateTime(2026, 6, 10);
             _mockBookingService
                 .Setup(s => s.GetBookingsForMonthAsync(date))
                 .ReturnsAsync(new List<BookingResponse>());
 
-            // Act – anropa controllern direkt
             var result = await _controller.GetMonthlyBookings(date);
 
-            // Assert – kontrollera att svaret är 200 OK
             var okResult = result.Result as OkObjectResult;
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
@@ -121,5 +119,30 @@ namespace SaddleHeroesAirWays.MSTest
 
             _mockBookingService.Verify(s => s.GetBookingsByUserIdAsync(userId), Times.Once);
         }
+
+        // Happy path test - verifies that the controller returns OK for all bookings
+        [TestMethod]
+        public async Task GetAllBookings_ReturnsSuccess()
+        {
+            // Arrange
+            var mockService = new Mock<IBookingService>();
+            mockService.Setup(s => s.GetAllBookingsMadeAsync())
+                .ReturnsAsync(new List<BookingResponse>
+                {
+                new BookingResponse("BKG-1001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 5, 1), 150.00m, "Confirmed", null),
+                new BookingResponse("BKG-1002", "Sadie", "Adler", "SH-102", "Heathrow Airport", "John F. Kennedy International", new DateTime(2026, 6, 2), new DateTime(2026, 5, 2), 600.00m, "Confirmed", null)
+                });
+
+            var controller = new BookingController(mockService.Object);
+
+            // Act
+            var result = await controller.GetAllBookings();
+
+            // Assert
+            var okResult = result.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(200, okResult.StatusCode);
+        }
+
     }
 }

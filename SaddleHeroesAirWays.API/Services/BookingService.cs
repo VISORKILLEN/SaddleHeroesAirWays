@@ -99,6 +99,31 @@ namespace SaddleHeroesAirWays.API.Services
                 .ToListAsync();
         }
 
+// Get all bookings made
+        public async Task<IEnumerable<BookingResponse>> GetAllBookingsMadeAsync()
+        {
+            return await _context.Booking
+                .Select(b => new BookingResponse(
+                    b.BookingReference,
+                    b.User.Firstname,
+                    b.User.Lastname,
+                    b.Flight.FlightNumber,
+                    b.Flight.DepartureAirport.Name,
+                    b.Flight.ArrivalAirport.Name,
+                    b.Flight.DepartureTime,
+                    b.BookingDate,
+                    b.TotalPrice,
+                    b.BookingStatus.ToString(),
+                    b.BookingDetails.Select(bd => new BookingDetailsResponse(
+                        bd.Id,
+                        bd.Seatnumber,
+                        bd.Baggage,
+                        bd.Notes
+                        ))
+                ))
+                .ToListAsync();
+        }
+
         public async Task<BookingResponse> CreateBookingAsync(CreateBookingRequest bookingRequest)
         {
             var flight = await _context.Flight.FindAsync(bookingRequest.FlightId);
