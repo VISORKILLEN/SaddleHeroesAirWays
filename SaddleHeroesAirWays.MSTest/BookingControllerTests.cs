@@ -133,7 +133,7 @@ namespace SaddleHeroesAirWays.MSTest
                 new BookingResponse("BKG-1002", "Sadie", "Adler", "SH-102", "Heathrow Airport", "John F. Kennedy International", new DateTime(2026, 6, 2), new DateTime(2026, 5, 2), 600.00m, "Confirmed", null)
                 });
 
-            var controller = new BookingController(mockService.Object);
+            var controller = new BookingController(mockService.Object, _mockValidator.Object);
 
             // Act
             var result = await controller.GetAllBookings();
