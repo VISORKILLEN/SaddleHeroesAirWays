@@ -65,12 +65,14 @@ namespace SaddleHeroesAirWays.MSTest
 
             var result = await service.GetAllUsersAlphabeticlyAsync();
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(3, result.Count);
+            var resultList = result.ToList();
 
-            Assert.AreEqual("Adams", result[0].Lastname);
-            Assert.AreEqual("Smith", result[1].Lastname);
-            Assert.AreEqual("Zane", result[2].Lastname);
+            Assert.IsNotNull(resultList);
+            Assert.AreEqual(3, resultList.Count);
+
+            Assert.AreEqual("Adams", resultList[0].Lastname);
+            Assert.AreEqual("Smith", resultList[1].Lastname);
+            Assert.AreEqual("Zane", resultList[2].Lastname);
         }
     }
 }
