@@ -145,27 +145,9 @@ namespace SaddleHeroesAirWays.API.Services
             var start = startDate.Date;
             var end = endDate.Date.AddDays(1);
 
-            return await _context.Booking
-                .Where(b => b.Flight.DepartureTime >= start &&
-                            b.Flight.DepartureTime < end)
-                .Select(b => new BookingResponse(
-                    b.BookingReference,
-                    b.User.Firstname,
-                    b.User.Lastname,
-                    b.Flight.FlightNumber,
-                    b.Flight.DepartureAirport.Name,
-                    b.Flight.ArrivalAirport.Name,
-                    b.Flight.DepartureTime,
-                    b.BookingDate,
-                    b.TotalPrice,
-                    b.BookingStatus.ToString(),
-                    b.BookingDetails.Select(bd => new BookingDetailsResponse(
-                        bd.Id,
-                        bd.Seatnumber,
-                        bd.Baggage,
-                        bd.Notes
-                        ))
-                ))
+            return await MapBookingToResponse(
+                _context.Booking.Where(b => b.Flight.DepartureTime
+                >= start && b.Flight.DepartureTime < end))
                 .ToListAsync();
         }
 
@@ -207,6 +189,7 @@ namespace SaddleHeroesAirWays.API.Services
                     b.Flight.DepartureTime,
                     b.BookingDate,
                     b.TotalPrice,
+                    "SEK",
                     b.BookingStatus.ToString(),
                     b.BookingDetails.Select(bd => new BookingDetailsResponse(
                         bd.Id,
