@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using SaddleHeroesAirWays.API.DTOs;
+using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 
 namespace SaddleHeroesAirWays.API.Controllers
@@ -34,7 +35,7 @@ namespace SaddleHeroesAirWays.API.Controllers
             return Ok(bookings);
         }
 
-        [HttpGet(template: "{id}", Name = "GetBookingsById")]
+        [HttpGet("user/{id}", Name = "GetBookingsById")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingsByUserId(int id)
         {
             if (id <= 0)
@@ -47,6 +48,19 @@ namespace SaddleHeroesAirWays.API.Controllers
             if (!booking.Any())
             {
                 return NotFound($"Användare med id {id} har inga bokningar.");
+            }
+
+            return Ok(booking);
+        }
+
+        [HttpGet("reference/{bookingReference}")]
+        public async Task<ActionResult<BookingResponse?>> GetBookingByBookingReference(string bookingReference)
+        {
+            var booking = await _bookingService.GetBookingByBookingReferenceAsync(bookingReference);
+            
+            if(booking == null)
+            {
+                return NotFound($"Bokningen {bookingReference} hittades inte.");
             }
 
             return Ok(booking);
@@ -74,25 +88,25 @@ namespace SaddleHeroesAirWays.API.Controllers
                 return BadRequest("Flyget hittades inte.");
             }
 
-            return Created(string.Empty, result);
+            return CreatedAtAction(nameof(GetBookingByBookingReference), new { bookingReference = result.BookingReference }, result);
         }
 
         [HttpPut("{bookingReference}")]
         public async Task<ActionResult<BookingResponse>> UpdateBooking(string bookingReference, UpdateBooking updateBooking)
         {
-            try
+            var result = await _bookingService.UpdateBookingAsync(bookingReference, updateBooking);
+
+            if (!result.Success)
             {
-                var result = await _bookingService.UpdateBookingAsync(bookingReference, updateBooking);
-                return Ok(result);
+                return result.Status switch
+                {
+                    ServiceResultStatus.NotFound => NotFound(result.ErrorMessage),
+                    ServiceResultStatus.ValidationError => BadRequest(result.ErrorMessage),
+                    _ => StatusCode(500, result.ErrorMessage)
+                };
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message); 
-            }
-            catch(InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            return Ok(result.Data);
         }
 
         // Get bookings for a specific date range based on the provided start and end dates

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SaddleHeroesAirWays.API.Controllers;
 using SaddleHeroesAirWays.API.DTOs;
+using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 
 namespace SaddleHeroesAirWays.MSTest
@@ -155,9 +156,8 @@ namespace SaddleHeroesAirWays.MSTest
                 .Setup(s => s.GetBookingsForDateRangeAsync(start, end))
                 .ReturnsAsync(new List<BookingResponse>
                 {
-            new BookingResponse("REF001", "Anna", "Svensson", "SK001",
-                "Stockholm Arlanda", "London Heathrow",
-                new DateTime(2025, 6, 5), DateTime.Now, 1000, "Confirmed", null)
+                    new BookingResponse("REF001", "Anna", "Svensson", "SK001", "Stockholm Arlanda", "London Heathrow",
+                    new DateTime(2025, 6, 5), DateTime.Now, 1000, "Confirmed", null)
                 });
 
             var result = await _controller.GetBookingsByDateRange(start, end);
@@ -180,5 +180,57 @@ namespace SaddleHeroesAirWays.MSTest
                 It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
         }
 
+        //Happy path - 200 ok
+        [TestMethod]
+        public async Task UpdateBooking_ValidRequest_ReturnsOk()
+        {
+            var bookingReference = "BKG-001";
+            var updateBooking = new UpdateBooking(2);
+            var bookingResponse = new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", DateTime.Now.AddDays(2), DateTime.Now, 150m, "Rebooked", null);
+
+            _mockBookingService
+                .Setup(s => s.UpdateBookingAsync(bookingReference, updateBooking))
+                .ReturnsAsync(ServiceResult<BookingResponse>.Ok(bookingResponse));
+
+            var result = await _controller.UpdateBooking(bookingReference, updateBooking);
+
+            var okResult = result.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(200, okResult.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task UpdateBooking_BookingNotFound_ReturnsNotFound()
+        {
+            var bookingReference = "BKG-999";
+            var updateBooking = new UpdateBooking(2);
+
+            _mockBookingService
+                .Setup(s => s.UpdateBookingAsync(bookingReference, updateBooking))
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Bokning BKG-999 hittades inte."));
+
+            var result = await _controller.UpdateBooking(bookingReference, updateBooking);
+
+            var notFoundResult = result.Result as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task UpdateBooking_TooLateToRebook_ReturnsBadRequest()
+        {
+            var bookingReference = "BKG-001";
+            var updateBooking = new UpdateBooking(2);
+
+            _mockBookingService
+                .Setup(s => s.UpdateBookingAsync(bookingReference, updateBooking))
+                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Det går inte att omboka mindre än en timme innan avgång."));
+
+            var actual = await _controller.UpdateBooking(bookingReference, updateBooking);
+
+            var badRequestResult = actual.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+        }
     }
 }
