@@ -37,6 +37,13 @@ namespace SaddleHeroesAirWays.API.Services
                 .ToListAsync();
         }
 
+        public async Task<BookingResponse?> GetBookingByBookingReferenceAsync(string bookingReference)
+        {
+            return await MapBookingToResponse(
+                _context.Booking.AsNoTracking().Where(b => b.BookingReference == bookingReference))
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(int userId)
         {
             return await MapBookingToResponse(
@@ -177,7 +184,7 @@ namespace SaddleHeroesAirWays.API.Services
            return updatedBooking;
         }
 
-        private IQueryable<BookingResponse> MapBookingToResponse(IQueryable<Booking> query)
+        private static IQueryable<BookingResponse> MapBookingToResponse(IQueryable<Booking> query)
         {
             return query.Select(b => new BookingResponse(
                     b.BookingReference,
