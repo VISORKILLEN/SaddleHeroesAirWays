@@ -33,10 +33,11 @@ namespace SaddleHeroesAirWays.API.Services
             return newUser;
         }
 
-        public async Task<List<User>> GetAllUsersAlphabeticlyAsync()
+        public async Task<IEnumerable<UserResponse>> GetAllUsersAlphabeticlyAsync()
         {
             var users = await _context.User
                 .OrderBy(u => u.Lastname)
+                .Select(u => new UserResponse(u.Id, u.Firstname, u.Lastname, u.Email, u.Phonenumber))
                 .ToListAsync();
 
             return users;

@@ -94,6 +94,18 @@ namespace SaddleHeroesAirWays.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-    
+
+        // Get bookings for a specific date range based on the provided start and end dates
+        [HttpGet("by-date-range")]
+        public async Task<IActionResult> GetBookingsByDateRange(
+            [FromQuery] DateTime startDate,
+            [FromQuery] DateTime endDate)
+        {
+            if (startDate > endDate)
+                return BadRequest("startDate must be before or equal to endDate.");
+
+            var bookings = await _bookingService.GetBookingsForDateRangeAsync(startDate, endDate);
+            return Ok(bookings);
+        }
     }
 }

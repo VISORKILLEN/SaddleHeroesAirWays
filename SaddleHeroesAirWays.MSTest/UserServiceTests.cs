@@ -1,68 +1,78 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
-using SaddleHeroesAirWays.API.Controllers;
+﻿using Microsoft.EntityFrameworkCore;
+using SaddleHeroesAirWays.API;
 using SaddleHeroesAirWays.API.DTOs;
-using SaddleHeroesAirWays.API.Services.Interfaces;
+using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.Library.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SaddleHeroesAirWays.MSTest
 {
     [TestClass]
     public class UserServiceTests
     {
-        private Mock<IUserService>? _userServiceMock;
-        private Mock<IValidator<CreateUser>> _validatorMock = null!;
-
-        private UserController? _userController;
-
-        [TestInitialize]
-        public void setup()
+        private DbContextAPI CreateContext(string dbName)
         {
-            _validatorMock = new Mock<IValidator<CreateUser>>();
-            _userServiceMock = new Mock<IUserService>();
-            _userController = new UserController(_userServiceMock.Object, _validatorMock.Object);
+            var options = new DbContextOptionsBuilder<DbContextAPI>()
+                .UseInMemoryDatabase(databaseName: dbName)
+                .Options;
+            return new DbContextAPI(options);
         }
 
         [TestMethod]
-        public async Task CreateUser_CreateANewUser_ReturnTrue()
+        public async Task CreateUserAsync_ShouldAddUserAndReturnIt()
         {
-            var createUserRequest = new CreateUser(
-                 Gender: "Male",
-                 Firstname: "John",
-                 Lastname: "Doe",
-                 Email: "john.doe@example.com",
-                 Phonenumber: "123-456-7890",
-                 SocialSecurityNumber: "19900101-1234"
+            using var context = CreateContext("CreateUserServiceTest");
+
+            var service = new UserService(context);
+
+            var request = new CreateUser(
+                Gender: "Male",
+                Firstname: "John",
+                Lastname: "Doe",
+                Email: "john.doe@example.com",
+                Phonenumber: "123-456-7890",
+                SocialSecurityNumber: "19900101-1234"
+                );
+
+            var result = await service.CreateUserAsync(request);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("John", result.Firstname);
+            Assert.AreEqual("Doe", result.Lastname);
+            Assert.IsFalse(result.IsAdmin);
+
+            var dbUsers = await context.User.ToListAsync();
+            Assert.AreEqual(1, dbUsers.Count);
+            Assert.AreEqual("john.doe@example.com", dbUsers.First().Email);
+        }
+
+        [TestMethod]
+        public async Task GetAllUsersAlphabeticlyAsync_ShouldReturnUsersSortedByLastName()
+        {
+            using var context = CreateContext("GetUsersAlphabeticlyTest");
+            var service = new UserService(context);
+
+            await context.User.AddRangeAsync(
+                new User { Firstname = "Alice", Lastname = "Zane", Email = "alice@example.com", SocialSecurityNumber = "1234567890" },
+                new User { Firstname = "Bob", Lastname = "Adams", Email = "bob@example.com", SocialSecurityNumber = "2345678901" },
+                new User { Firstname = "Charlie", Lastname = "Smith", Email = "charlie@example.com", SocialSecurityNumber = "3456789012" }
             );
+            await context.SaveChangesAsync();
 
-            var createdUser = new User
-            {
-                Firstname = "John",
-                Lastname = "Doe",
-                Email = "john.doe@example.com",
-                SocialSecurityNumber = "19900101-1234"
-            };
+            var result = await service.GetAllUsersAlphabeticlyAsync();
 
-            _validatorMock
-                .Setup(v => v.ValidateAsync(createUserRequest, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new ValidationResult());
+            var resultList = result.ToList();
 
-            _userServiceMock
-                .Setup(s => s.CreateUserAsync(createUserRequest))
-                .ReturnsAsync(createdUser);
+            Assert.IsNotNull(resultList);
+            Assert.AreEqual(3, resultList.Count);
 
-            var result = await _userController.CreateUser(createUserRequest);
-
-            var okResult = result.Result as OkObjectResult;
-
-            Assert.IsNotNull(okResult, "Förväntad att controllern kommer returna OK() result :)");
-            Assert.AreEqual(200, okResult.StatusCode);
-
-            var returnedUser = okResult.Value as User;
-            Assert.IsNotNull(returnedUser);
-            Assert.AreEqual("19900101-1234", returnedUser.SocialSecurityNumber);
+            Assert.AreEqual("Adams", resultList[0].Lastname);
+            Assert.AreEqual("Smith", resultList[1].Lastname);
+            Assert.AreEqual("Zane", resultList[2].Lastname);
         }
     }
 }

@@ -206,5 +206,48 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.AreEqual(3, result.Count());
         }
+
+        // Happy path - returns bookings within the given date range
+        [TestMethod]
+        public async Task GetBookingsForDateRange_ValidRange_ReturnsOnlyBookingsWithinRange()
+        {
+            using var context = CreateContext("BookingDateRangeTest");
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, Name = "Göteborg", IATACode = "GOT" },
+                new Airport { Id = 2, Name = "Stockholm", IATACode = "ARN" }
+            );
+            context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
+            context.Flight.AddRange(
+                new Flight { Id = 1, DepartureTime = new DateTime(2026, 6, 10), FlightNumber = "SH001", DepartureAirportId = 1, ArrivalAirportId = 2 },
+                new Flight { Id = 2, DepartureTime = new DateTime(2026, 7, 10), FlightNumber = "SH002", DepartureAirportId = 1, ArrivalAirportId = 2 }
+            );
+            context.Booking.AddRange(
+                new Booking { BookingReference = "B1", FlightId = 1, UserId = 1 },
+                new Booking { BookingReference = "B2", FlightId = 2, UserId = 1 }
+            );
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var result = await service.GetBookingsForDateRangeAsync(
+                new DateTime(2026, 6, 1),
+                new DateTime(2026, 6, 30));
+
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual("B1", result.First().BookingReference);
+        }
+
+        // Edge case - start date after end date throws ArgumentException
+        [TestMethod]
+        public async Task GetBookingsForDateRange_StartAfterEnd_ThrowsArgumentException()
+        {
+            using var context = CreateContext("BookingDateRangeInvalidTest");
+            var service = new BookingService(context);
+
+            await Assert.ThrowsExceptionAsync<ArgumentException>(() =>
+                service.GetBookingsForDateRangeAsync(
+                    new DateTime(2026, 6, 30),
+                    new DateTime(2026, 6, 1)));
+        }
     }
 }
