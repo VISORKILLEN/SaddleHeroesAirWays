@@ -37,7 +37,7 @@ namespace SaddleHeroesAirWays.API.Controllers
         [HttpGet("{id}", Name = "GetBookingsById")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingsByUserId(int id)
         {
-            if(id <= 0)
+            if (id <= 0)
             {
                 return BadRequest("Ogiltigt användar-Id.");
             }
@@ -52,7 +52,7 @@ namespace SaddleHeroesAirWays.API.Controllers
             return Ok(booking);
         }
 
-        [HttpPost]
+        [HttpPost("CreateBooking")]
         public async Task<ActionResult<BookingResponse>> CreateBooking(CreateBookingRequest bookingRequest)
         {
             var validationResult = await _createBookingValidator.ValidateAsync(bookingRequest);
@@ -74,7 +74,25 @@ namespace SaddleHeroesAirWays.API.Controllers
                 return BadRequest("Flyget hittades inte.");
             }
 
-            return Created(string.Empty,result);
+            return Created(string.Empty, result);
+        }
+
+        [HttpPut("{bookingReference}")]
+        public async Task<ActionResult<BookingResponse>> UpdateBooking(string bookingReference, UpdateBooking updateBooking)
+        {
+            try
+            {
+                var result = await _bookingService.UpdateBookingAsync(bookingReference, updateBooking);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message); 
+            }
+            catch(InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // Get bookings for a specific date range based on the provided start and end dates
