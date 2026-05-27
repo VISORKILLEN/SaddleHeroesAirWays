@@ -189,7 +189,6 @@ namespace SaddleHeroesAirWays.API.Services
                     b.Flight.DepartureTime,
                     b.BookingDate,
                     b.TotalPrice,
-                    "SEK",
                     b.BookingStatus.ToString(),
                     b.BookingDetails.Select(bd => new BookingDetailsResponse(
                         bd.Id,
