@@ -25,29 +25,6 @@ namespace SaddleHeroesAirWays.API.Services
             return await MapBookingToResponse(
                 _context.Booking.Where(b => b.Flight.DepartureTime >= startOfWeek && b.Flight.DepartureTime < endOfWeek))
                 .ToListAsync();
-
-            //return await _context.Booking
-            //    .Where(b => b.Flight.DepartureTime >= startOfWeek &&
-            //                b.Flight.DepartureTime < endOfWeek)
-            //    .Select(b => new BookingResponse(
-            //        b.BookingReference,
-            //        b.User.Firstname,
-            //        b.User.Lastname,
-            //        b.Flight.FlightNumber,
-            //        b.Flight.DepartureAirport.Name,
-            //        b.Flight.ArrivalAirport.Name,
-            //        b.Flight.DepartureTime,
-            //        b.BookingDate,
-            //        b.TotalPrice,
-            //        b.BookingStatus.ToString(),
-            //        b.BookingDetails.Select(bd => new BookingDetailsResponse(
-            //            bd.Id,
-            //            bd.Seatnumber,
-            //            bd.Baggage,
-            //            bd.Notes
-            //            ))
-            //    ))
-            //    .ToListAsync();
         }
 
         public async Task<IEnumerable<BookingResponse>> GetBookingsForMonthAsync(DateTime date)
@@ -58,29 +35,6 @@ namespace SaddleHeroesAirWays.API.Services
             return await MapBookingToResponse(
                 _context.Booking.Where(b => b.Flight.DepartureTime >= startOfMonth && b.Flight.DepartureTime < endOfMonth))
                 .ToListAsync();
-
-            //return await _context.Booking
-            //    .Where(b => b.Flight.DepartureTime >= startOfMonth &&
-            //                b.Flight.DepartureTime < endOfMonth)
-            //    .Select(b => new BookingResponse(
-            //        b.BookingReference,
-            //        b.User.Firstname,
-            //        b.User.Lastname,
-            //        b.Flight.FlightNumber,
-            //        b.Flight.DepartureAirport.Name,
-            //        b.Flight.ArrivalAirport.Name,
-            //        b.Flight.DepartureTime,
-            //        b.BookingDate,
-            //        b.TotalPrice,
-            //        b.BookingStatus.ToString(),
-            //        b.BookingDetails.Select(bd => new BookingDetailsResponse(
-            //            bd.Id,
-            //            bd.Seatnumber,
-            //            bd.Baggage,
-            //            bd.Notes
-            //            ))
-            //    ))
-            //    .ToListAsync();
         }
 
         public async Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(int userId)
@@ -88,28 +42,6 @@ namespace SaddleHeroesAirWays.API.Services
             return await MapBookingToResponse(
                 _context.Booking.AsNoTracking().Where(b => b.UserId == userId))
                 .ToListAsync();
-
-            //return await _context.Booking
-            //    .Where(b => b.UserId == userId)
-            //    .Select(b => new BookingResponse(
-            //        b.BookingReference,
-            //        b.User.Firstname,
-            //        b.User.Lastname,
-            //        b.Flight.FlightNumber,
-            //        b.Flight.DepartureAirport.Name,
-            //        b.Flight.ArrivalAirport.Name,
-            //        b.Flight.DepartureTime,
-            //        b.BookingDate,
-            //        b.TotalPrice,
-            //        b.BookingStatus.ToString(),
-            //        b.BookingDetails.Select(bd => new BookingDetailsResponse(
-            //            bd.Id, 
-            //            bd.Seatnumber,
-            //            bd.Baggage,
-            //            bd.Notes
-            //            ))
-            //    ))
-            //    .ToListAsync();
         }
 
         // Get all bookings made
@@ -117,26 +49,6 @@ namespace SaddleHeroesAirWays.API.Services
         {
             return await MapBookingToResponse(_context.Booking)
                 .ToListAsync();
-            //return await _context.Booking
-            //    .Select(b => new BookingResponse(
-            //        b.BookingReference,
-            //        b.User.Firstname,
-            //        b.User.Lastname,
-            //        b.Flight.FlightNumber,
-            //        b.Flight.DepartureAirport.Name,
-            //        b.Flight.ArrivalAirport.Name,
-            //        b.Flight.DepartureTime,
-            //        b.BookingDate,
-            //        b.TotalPrice,
-            //        b.BookingStatus.ToString(),
-            //        b.BookingDetails.Select(bd => new BookingDetailsResponse(
-            //            bd.Id,
-            //            bd.Seatnumber,
-            //            bd.Baggage,
-            //            bd.Notes
-            //            ))
-            //    ))
-            //    .ToListAsync();
         }
 
         public async Task<BookingResponse> CreateBookingAsync(CreateBookingRequest bookingRequest)
@@ -192,28 +104,6 @@ namespace SaddleHeroesAirWays.API.Services
                 _context.Booking.Where(b => b.BookingReference == bookingToAdd.BookingReference))
                 .FirstOrDefaultAsync();
 
-            //var createdBooking = await _context.Booking
-            //    .Where(b => b.BookingReference == bookingToAdd.BookingReference)
-            //    .Select(b => new BookingResponse(
-            //        b.BookingReference,
-            //        b.User.Firstname,
-            //        b.User.Lastname,
-            //        b.Flight.FlightNumber,
-            //        b.Flight.DepartureAirport.Name,
-            //        b.Flight.ArrivalAirport.Name,
-            //        b.Flight.DepartureTime,
-            //        b.BookingDate,
-            //        b.TotalPrice,
-            //        b.BookingStatus.ToString(),
-            //        b.BookingDetails.Select(bd => new BookingDetailsResponse(
-            //            bd.Id,
-            //            bd.Seatnumber,
-            //            bd.Baggage,
-            //            bd.Notes
-            //            ))
-            //    ))
-            //    .FirstOrDefaultAsync();
-
             return createdBooking;
         }
 
@@ -248,11 +138,15 @@ namespace SaddleHeroesAirWays.API.Services
         public async Task<BookingResponse> UpdateBookingAsync(string bookingReference, UpdateBooking updateBooking)
         {
             var booking = await _context.Booking
-                .FirstOrDefaultAsync(b => b.BookingReference == bookingReference);
+                .FirstOrDefaultAsync(b => b.BookingReference == bookingReference)
+                ?? throw new KeyNotFoundException($"Bokning {bookingReference} hittades inte.");
 
-            if (booking == null)
+            var flight = await _context.Flight.FindAsync(booking.FlightId)
+                ?? throw new KeyNotFoundException($"Flyget hittades inte.");
+
+            if(flight.DepartureTime <= DateTime.Now.AddHours(1))
             {
-                return null;
+                throw new InvalidOperationException("Det går inte att omboka mindre än en timme innan avgång.");
             }
 
             booking.FlightId = updateBooking.FlightId ?? booking.FlightId;
@@ -264,29 +158,7 @@ namespace SaddleHeroesAirWays.API.Services
                 _context.Booking.Where(b => b.BookingReference == bookingReference))
                 .FirstOrDefaultAsync();
 
-            //var updatedBooking = await _context.Booking
-            //    .Where(b => b.BookingReference == bookingReference)
-            //    .Select(b => new BookingResponse(
-            //        b.BookingReference,
-            //        b.User.Firstname,
-            //        b.User.Lastname,
-            //        b.Flight.FlightNumber,
-            //        b.Flight.DepartureAirport.Name,
-            //        b.Flight.ArrivalAirport.Name,
-            //        b.Flight.DepartureTime,
-            //        b.BookingDate,
-            //        b.TotalPrice,
-            //        b.BookingStatus.ToString(),
-            //        b.BookingDetails.Select(bd => new BookingDetailsResponse(
-            //            bd.Id,
-            //            bd.Seatnumber,
-            //            bd.Baggage,
-            //            bd.Notes
-            //            ))
-            //    ))
-            //    .FirstOrDefaultAsync();
-
-            return updatedBooking;
+           return updatedBooking;
         }
 
         private IQueryable<BookingResponse> MapBookingToResponse(IQueryable<Booking> query)
