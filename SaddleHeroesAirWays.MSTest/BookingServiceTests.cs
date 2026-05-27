@@ -180,9 +180,6 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task GetAllBookings_ShouldReturnAllBookings()
         {
-            //var options = new DbContextOptionsBuilder<DbContextAPI>()
-            //    .UseInMemoryDatabase(databaseName: "BookingAllTest")
-            //    .Options;
             using var context = CreateContext("GetAllBookings");
 
             context.Airport.AddRange(
@@ -263,9 +260,9 @@ namespace SaddleHeroesAirWays.MSTest
                 );
 
             context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
-            
+
             context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 150, Price = 150m });
-            
+
             context.SaveChanges();
 
             var service = new BookingService(context);
@@ -289,5 +286,31 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.IsNull(actual);
         }
+
+        [TestMethod]
+        public async Task CreateBooking_FlightIsFull_ReturnNull()
+        {
+            using var context = CreateContext("CreateBookingFullFlight");
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 1, Price = 150m });
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = DateTime.Now, TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+            context.BookingDetails.Add(new BookingDetails { Id = 1, BookingReference = "BKG-001", Seatnumber = "1A", Baggage = false, Notes = "" });
+            
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var request = new CreateBookingRequest(1, 1, null);
+            var actual = await service.CreateBookingAsync(request);
+
+            Assert.IsNull(actual);
+        }
+
+
     }
 }
