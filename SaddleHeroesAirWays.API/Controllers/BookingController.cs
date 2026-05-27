@@ -34,7 +34,7 @@ namespace SaddleHeroesAirWays.API.Controllers
             return Ok(bookings);
         }
 
-        [HttpGet("{id}", Name = "GetBookingsById")]
+        [HttpGet("user/{id}", Name = "GetBookingsById")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingsByUserId(int id)
         {
             if (id <= 0)
@@ -47,6 +47,19 @@ namespace SaddleHeroesAirWays.API.Controllers
             if (!booking.Any())
             {
                 return NotFound($"Användare med id {id} har inga bokningar.");
+            }
+
+            return Ok(booking);
+        }
+
+        [HttpGet("reference/{bookingReference}")]
+        public async Task<ActionResult<BookingResponse?>> GetBookingByBookingReference(string bookingReference)
+        {
+            var booking = await _bookingService.GetBookingByBookingReferenceAsync(bookingReference);
+            
+            if(booking == null)
+            {
+                return NotFound($"Bokningen {bookingReference} hittades inte.");
             }
 
             return Ok(booking);
