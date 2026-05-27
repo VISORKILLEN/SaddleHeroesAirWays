@@ -34,7 +34,7 @@ namespace SaddleHeroesAirWays.API.Controllers
             return Ok(bookings);
         }
 
-        [HttpGet("{id}", Name = "GetBookingsById")]
+        [HttpGet(template: "{id}", Name = "GetBookingsById")]
         public async Task<ActionResult<IEnumerable<BookingResponse>>> GetBookingsByUserId(int id)
         {
             if(id <= 0)
