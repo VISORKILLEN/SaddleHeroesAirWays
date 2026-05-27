@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using SaddleHeroesAirWays.API.DTOs;
+using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 
 namespace SaddleHeroesAirWays.API.Controllers
@@ -93,19 +94,19 @@ namespace SaddleHeroesAirWays.API.Controllers
         [HttpPut("{bookingReference}")]
         public async Task<ActionResult<BookingResponse>> UpdateBooking(string bookingReference, UpdateBooking updateBooking)
         {
-            try
+            var result = await _bookingService.UpdateBookingAsync(bookingReference, updateBooking);
+
+            if (!result.Success)
             {
-                var result = await _bookingService.UpdateBookingAsync(bookingReference, updateBooking);
-                return Ok(result);
+                return result.Status switch
+                {
+                    ServiceResultStatus.NotFound => NotFound(result.ErrorMessage),
+                    ServiceResultStatus.ValidationError => BadRequest(result.ErrorMessage),
+                    _ => StatusCode(500, result.ErrorMessage)
+                };
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message); 
-            }
-            catch(InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            return Ok(result.Data);
         }
 
         // Get bookings for a specific date range based on the provided start and end dates
