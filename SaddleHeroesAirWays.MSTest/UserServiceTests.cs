@@ -74,5 +74,23 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Smith", resultList[1].Lastname);
             Assert.AreEqual("Zane", resultList[2].Lastname);
         }
+
+        [TestMethod]
+        public async Task GetAllUsersAlphabeticlyAsyncWithNoUsers_ShouldReturnUsersOk()
+        {
+            using var context = CreateContext("GetUsersAlphabeticlyTest");
+            var service = new UserService(context);
+
+            await context.User.AddRangeAsync();
+
+            await context.SaveChangesAsync();
+
+            var result = await service.GetAllUsersAlphabeticlyAsync();
+
+            var resultList = result.ToList();
+
+            Assert.IsNotNull(resultList);
+            Assert.AreEqual(0, resultList.Count);
+        }
     }
 }
