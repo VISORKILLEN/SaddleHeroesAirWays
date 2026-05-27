@@ -53,7 +53,7 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task CreateUserAsync_WithEmptyEmailAndNullLastname_ShouldStillSaveUser()
         {
-            using var context = CreateContext("CreateUserServiceTest");
+            using var context = CreateContext("CreateFaultyUserServiceTest");
 
             var service = new UserService(context);
 
@@ -104,7 +104,7 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task GetAllUsersAlphabeticlyAsyncWithNoUsers_ShouldReturnUsersOk()
         {
-            using var context = CreateContext("GetUsersAlphabeticlyTest");
+            using var context = CreateContext("GetUsersAlphabeticlyTestNoUsers");
             var service = new UserService(context);
 
             await context.User.AddRangeAsync();
