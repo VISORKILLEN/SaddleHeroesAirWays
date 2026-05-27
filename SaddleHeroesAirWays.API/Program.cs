@@ -25,6 +25,7 @@ namespace SaddleHeroesAirWays.API
             builder.Services.AddScoped<IUserService, UserService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IFlightService, FlightService>();
             builder.Services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingValidator>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
