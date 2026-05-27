@@ -51,6 +51,32 @@ namespace SaddleHeroesAirWays.MSTest
         }
 
         [TestMethod]
+        public async Task CreateUserAsync_WithEmptyEmailAndNullLastname_ShouldStillSaveUser()
+        {
+            using var context = CreateContext("CreateUserServiceTest");
+
+            var service = new UserService(context);
+
+            var request = new CreateUser(
+                Gender: "Male",
+                Firstname: "John",
+                Lastname: null,
+                Email: "", //No mail
+                Phonenumber: "123-456-7890",
+                SocialSecurityNumber: "19900101-1234"
+                );
+
+            var result = await service.CreateUserAsync(request);
+
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Email);
+            Assert.IsNull(result.Lastname);
+
+            var dbUsers = await context.User.ToListAsync();
+            Assert.AreEqual(1, dbUsers.Count);
+        }
+
+        [TestMethod]
         public async Task GetAllUsersAlphabeticlyAsync_ShouldReturnUsersSortedByLastName()
         {
             using var context = CreateContext("GetUsersAlphabeticlyTest");
