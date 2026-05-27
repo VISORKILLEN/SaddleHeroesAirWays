@@ -9,12 +9,11 @@ namespace SaddleHeroesAirWays.API.Controllers
     {
         private readonly IFlightService _flightService = flightService;
 
+        // GET: api/flight/search?city=Stockholm
         [HttpGet("search")]
-        public async Task<IActionResult> SearchAvailableFlights(
-            [FromQuery] DateTime date,
-            [FromQuery] string? city = null)
+        public async Task<IActionResult> SearchAvailableFlights([FromQuery] string? city = null)
         {
-            var flights = await _flightService.SearchAvailableFlightsAsync(date, city);
+            var flights = await _flightService.SearchAvailableFlightsAsync(city);
 
             if (!flights.Any())
             {
