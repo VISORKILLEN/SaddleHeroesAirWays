@@ -14,11 +14,10 @@ namespace SaddleHeroesAirWays.API.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<FlightResponse>> SearchAvailableFlightsAsync(DateTime date, string? city = null)
+        public async Task<IEnumerable<FlightResponse>> SearchAvailableFlightsAsync(string? city = null)
         {
             var query = _context.Flight
-                .Where(f => f.DepartureTime.Date == date.Date &&
-                            f.TotalSeats > f.Bookings.Count);
+                .Where(f => f.Bookings.Count < f.TotalSeats);
 
             if (!string.IsNullOrWhiteSpace(city))
                 query = query.Where(f => f.DepartureAirport.City == city ||
@@ -31,7 +30,7 @@ namespace SaddleHeroesAirWays.API.Services
                     f.ArrivalAirport.Name,
                     f.DepartureTime,
                     f.ArrivalTime,
-                    f.TotalSeats - f.Bookings.Count,  // visar lediga platser
+                    f.TotalSeats - f.Bookings.Count,
                     f.Price,
                     f.FlightStatus.ToString()
                 ))
