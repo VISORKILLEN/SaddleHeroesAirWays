@@ -158,18 +158,26 @@ namespace SaddleHeroesAirWays.API.Services
                 .ToListAsync();
         }
 
-        public async Task<BookingResponse> UpdateBookingAsync(string bookingReference, UpdateBooking updateBooking)
+        public async Task<ServiceResult<BookingResponse>> UpdateBookingAsync(string bookingReference, UpdateBooking updateBooking)
         {
             var booking = await _context.Booking
-                .FirstOrDefaultAsync(b => b.BookingReference == bookingReference)
-                ?? throw new KeyNotFoundException($"Bokning {bookingReference} hittades inte.");
+                .FirstOrDefaultAsync(b => b.BookingReference == bookingReference);
+            
+            if (booking is null) 
+            { 
+                return ServiceResult<BookingResponse>.NotFound($"Bokning {bookingReference} hittades inte.");
+            }
 
-            var flight = await _context.Flight.FindAsync(booking.FlightId)
-                ?? throw new KeyNotFoundException($"Flyget hittades inte.");
-
-            if(flight.DepartureTime <= DateTime.Now.AddHours(1))
+            var flight = await _context.Flight.FindAsync(booking.FlightId);
+            
+            if (flight is null) 
+            { 
+                return ServiceResult<BookingResponse>.NotFound("Flyget hittades inte.");
+            } 
+            
+            if (flight.DepartureTime <= DateTime.Now.AddHours(1))
             {
-                throw new InvalidOperationException("Det går inte att omboka mindre än en timme innan avgång.");
+                return ServiceResult<BookingResponse>.ValidationError("Det går inte att omboka mindre än en timme innan avgång.");
             }
 
             booking.FlightId = updateBooking.FlightId ?? booking.FlightId;
@@ -181,7 +189,7 @@ namespace SaddleHeroesAirWays.API.Services
                 _context.Booking.Where(b => b.BookingReference == bookingReference))
                 .FirstOrDefaultAsync();
 
-           return updatedBooking;
+           return ServiceResult<BookingResponse>.Ok(updatedBooking);
         }
 
         private static IQueryable<BookingResponse> MapBookingToResponse(IQueryable<Booking> query)
