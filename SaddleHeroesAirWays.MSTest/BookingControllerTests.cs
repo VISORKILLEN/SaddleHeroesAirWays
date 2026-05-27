@@ -144,5 +144,28 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
+        // Happy path - valid date range returns OK
+        [TestMethod]
+        public async Task GetBookingsByDateRange_ValidDates_ReturnsOk()
+        {
+            var start = new DateTime(2025, 6, 1);
+            var end = new DateTime(2025, 6, 30);
+
+            _mockBookingService
+                .Setup(s => s.GetBookingsForDateRangeAsync(start, end))
+                .ReturnsAsync(new List<BookingResponse>
+                {
+            new BookingResponse("REF001", "Anna", "Svensson", "SK001",
+                "Stockholm Arlanda", "London Heathrow",
+                new DateTime(2025, 6, 5), DateTime.Now, 1000, "Confirmed", null)
+                });
+
+            var result = await _controller.GetBookingsByDateRange(start, end);
+
+            var ok = result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(200, ok.StatusCode);
+        }
+
     }
 }
