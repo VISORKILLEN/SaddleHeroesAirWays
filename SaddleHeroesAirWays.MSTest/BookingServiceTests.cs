@@ -180,10 +180,10 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task GetAllBookings_ShouldReturnAllBookings()
         {
-            var options = new DbContextOptionsBuilder<DbContextAPI>()
-                .UseInMemoryDatabase(databaseName: "BookingAllTest")
-                .Options;
-            using var context = new DbContextAPI(options);
+            //var options = new DbContextOptionsBuilder<DbContextAPI>()
+            //    .UseInMemoryDatabase(databaseName: "BookingAllTest")
+            //    .Options;
+            using var context = CreateContext("GetAllBookings");
 
             context.Airport.AddRange(
                 new Airport { Id = 1, Name = "Göteborg", IATACode = "GOT" },
@@ -253,7 +253,7 @@ namespace SaddleHeroesAirWays.MSTest
 
         //Happy path - skapar en korrekt bokning
         [TestMethod]
-        public async Task CreateBookingAsync_ValidRequest_ReturnBookingResponse()
+        public async Task CreateBooking_ValidRequest_ReturnBookingResponse()
         {
             using var context = CreateContext("CreateBookingHappyPath");
 
@@ -276,6 +276,18 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Arthur", actual.Firstname);
             Assert.AreEqual("Confirmed", actual.BookingStatus);
             Assert.AreEqual(150m, actual.TotalPrice);
+        }
+        //Edge case - Flight finns inte - retunera null
+        [TestMethod]
+        public async Task CreateBooking_FlightNotFound_ReturnNull()
+        {
+            using var context = CreateContext("CreateBookingNoFLight");
+
+            var service = new BookingService(context);
+            var request = new CreateBookingRequest(1, 99, null);
+            var actual = await service.CreateBookingAsync(request);
+
+            Assert.IsNull(actual);
         }
     }
 }
