@@ -57,5 +57,18 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(ok);
             Assert.AreEqual(200, ok.StatusCode);
         }
+
+        // Edge case - no flights found returns 404
+        [TestMethod]
+        public async Task SearchAvailableFlights_NoFlightsFound_ReturnsNotFound()
+        {
+            _mockFlightService
+                .Setup(s => s.SearchAvailableFlightsAsync("Tokyo"))
+                .ReturnsAsync(new List<FlightResponse>());
+
+            var result = await _controller.SearchAvailableFlights("Tokyo");
+
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+        }
     }
 }
