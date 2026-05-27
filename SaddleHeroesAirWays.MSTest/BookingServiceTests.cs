@@ -311,6 +311,29 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNull(actual);
         }
 
+        [TestMethod]
+        public async Task CreateBookingAsync_ValidRequest_ReturnCorrectlyMappedData()
+        {
+            using var context = CreateContext("CreateBookingMappedData");
 
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 150, Price = 150m });
+
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var request = new CreateBookingRequest(1, 1, null);
+            var actual = await service.CreateBookingAsync(request);
+
+            Assert.AreEqual("BKG-1001", actual.BookingReference);
+            Assert.AreEqual("Stockholm Arlanda", actual.DepartureAirport);
+            Assert.AreEqual("Heathrow Airport", actual.ArrivalAirport);
+            Assert.AreEqual("SH-101", actual.Flightnumber);
+        }
     }
 }
