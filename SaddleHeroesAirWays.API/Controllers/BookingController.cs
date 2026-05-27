@@ -87,7 +87,7 @@ namespace SaddleHeroesAirWays.API.Controllers
                 return BadRequest("Flyget hittades inte.");
             }
 
-            return Created(string.Empty, result);
+            return CreatedAtAction(nameof(GetBookingByBookingReference), new { bookingReference = result.BookingReference }, result);
         }
 
         [HttpPut("{bookingReference}")]
