@@ -364,5 +364,18 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsTrue(actual.Success);
             Assert.AreEqual("Rebooked", actual.Data.BookingStatus);
         }
+
+        [TestMethod]
+        public async Task UpdateBookingAsync_BookingNotFound_ReturnNotFound()
+        {
+            using var context = CreateContext("UpdateBookingNotFound");
+
+            var service = new BookingService(context);
+            var request = new UpdateBooking(1);
+            var actual = await service.UpdateBookingAsync("BKG-999", request);
+
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
+        }
     }
 }
