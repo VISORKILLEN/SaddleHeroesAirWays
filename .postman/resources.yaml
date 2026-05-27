@@ -1,0 +1,7 @@
+# Use this workspace to collaborate
+workspace:
+  id: 250a4283-1f66-4195-8de6-4731a593a517
+
+localResources:
+  specs:
+    - ..\SaddleHeroesAirWays.API\obj\Debug\net8.0\EndpointInfo\SaddleHeroesAirWays.API.json
