@@ -180,6 +180,7 @@ namespace SaddleHeroesAirWays.MSTest
                 It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
         }
 
+        //Happy path - 200 ok
         [TestMethod]
         public async Task UpdateBooking_ValidRequest_ReturnsOk()
         {
@@ -196,6 +197,40 @@ namespace SaddleHeroesAirWays.MSTest
             var okResult = result.Result as OkObjectResult;
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task UpdateBooking_BookingNotFound_ReturnsNotFound()
+        {
+            var bookingReference = "BKG-999";
+            var updateBooking = new UpdateBooking(2);
+
+            _mockBookingService
+                .Setup(s => s.UpdateBookingAsync(bookingReference, updateBooking))
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Bokning BKG-999 hittades inte."));
+
+            var result = await _controller.UpdateBooking(bookingReference, updateBooking);
+
+            var notFoundResult = result.Result as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task UpdateBooking_TooLateToRebook_ReturnsBadRequest()
+        {
+            var bookingReference = "BKG-001";
+            var updateBooking = new UpdateBooking(2);
+
+            _mockBookingService
+                .Setup(s => s.UpdateBookingAsync(bookingReference, updateBooking))
+                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Det går inte att omboka mindre än en timme innan avgång."));
+
+            var actual = await _controller.UpdateBooking(bookingReference, updateBooking);
+
+            var badRequestResult = actual.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(400, badRequestResult.StatusCode);
         }
     }
 }
