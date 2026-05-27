@@ -236,5 +236,18 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual("B1", result.First().BookingReference);
         }
+
+        // Edge case - start date after end date throws ArgumentException
+        [TestMethod]
+        public async Task GetBookingsForDateRange_StartAfterEnd_ThrowsArgumentException()
+        {
+            using var context = CreateContext("BookingDateRangeInvalidTest");
+            var service = new BookingService(context);
+
+            await Assert.ThrowsExceptionAsync<ArgumentException>(() =>
+                service.GetBookingsForDateRangeAsync(
+                    new DateTime(2026, 6, 30),
+                    new DateTime(2026, 6, 1)));
+        }
     }
 }
