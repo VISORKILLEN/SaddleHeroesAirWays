@@ -12,7 +12,7 @@ namespace SaddleHeroesAirWays.MSTest
 {
     [TestClass]
 
-    internal class FlightServiceTests
+    public class FlightServiceTests
     {
         // Helper method to create a new in-memory database context for each test
         private DbContextAPI CreateContext(string dbName)
@@ -72,7 +72,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("SH001", result.First().Flightnumber);
         }
 
-        // Edge case - no available seats returns empty list
+        // Edge case, no available seats returns empty list
         [TestMethod]
         public async Task SearchAvailableFlights_NoAvailableSeats_ReturnsEmpty()
         {
@@ -85,7 +85,14 @@ namespace SaddleHeroesAirWays.MSTest
             context.Flight.Add(
                 new Flight { Id = 1, FlightNumber = "SH001", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 1, Price = 150m, FlightStatus = FlightStatus.Arrived }
             );
-           
+            context.User.Add(new User { Id = 1, Firstname = "Test", Lastname = "User" });
+            context.Booking.Add(new Booking { BookingReference = "B1", FlightId = 1, UserId = 1 });
+            context.SaveChanges();
+
+            var service = new FlightService(context);
+            var result = await service.SearchAvailableFlightsAsync();
+
+            Assert.AreEqual(0, result.Count());
         }
 
 
