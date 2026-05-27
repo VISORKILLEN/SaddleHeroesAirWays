@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using SaddleHeroesAirWays.API;
+using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.Library.Models;
 
@@ -248,6 +249,33 @@ namespace SaddleHeroesAirWays.MSTest
                 service.GetBookingsForDateRangeAsync(
                     new DateTime(2026, 6, 30),
                     new DateTime(2026, 6, 1)));
+        }
+
+        //Happy path - skapar en korrekt bokning
+        [TestMethod]
+        public async Task CreateBookingAsync_ValidRequest_ReturnBookingResponse()
+        {
+            using var context = CreateContext("CreateBookingHappyPath");
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+                );
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 150, Price = 150m });
+            
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var request = new CreateBookingRequest(1, 1, null);
+            var actual = await service.CreateBookingAsync(request);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual("Arthur", actual.Firstname);
+            Assert.AreEqual("Confirmed", actual.BookingStatus);
+            Assert.AreEqual(150m, actual.TotalPrice);
         }
     }
 }
