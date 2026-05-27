@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Routing.Matching;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using SaddleHeroesAirWays.API;
@@ -312,7 +313,7 @@ namespace SaddleHeroesAirWays.MSTest
         }
 
         [TestMethod]
-        public async Task CreateBookingAsync_ValidRequest_ReturnCorrectlyMappedData()
+        public async Task CreateBooking_ValidRequest_ReturnCorrectlyMappedData()
         {
             using var context = CreateContext("CreateBookingMappedData");
 
@@ -336,8 +337,9 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("SH-101", actual.Flightnumber);
         }
 
+        //ombokning lyckas
         [TestMethod]
-        public async Task UpdateBookingAsync_ValidRequest_ReturnSuccess()
+        public async Task UpdateBooking_ValidRequest_ReturnSuccess()
         {
             using var context = CreateContext("UpdateBookingHappyPath");
 
@@ -365,8 +367,9 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Rebooked", actual.Data.BookingStatus);
         }
 
+        //bokning finns inte
         [TestMethod]
-        public async Task UpdateBookingAsync_BookingNotFound_ReturnNotFound()
+        public async Task UpdateBooking_BookingNotFound_ReturnNotFound()
         {
             using var context = CreateContext("UpdateBookingNotFound");
 
@@ -376,6 +379,28 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.IsFalse(actual.Success);
             Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookingAsync_TooLateToRebook_ReturnValidationError()
+        {
+            using var context = CreateContext("UpdateBookingTooLate");
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = DateTime.Now.AddMinutes(30), ArrivalTime = DateTime.Now.AddMinutes(30), TotalSeats = 150, Price = 150m });
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = DateTime.Now, TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var request = new UpdateBooking(1);
+            var actual = await service.UpdateBookingAsync("BKG-001", request);
+
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.ValidationError, actual.Status);
         }
     }
 }
