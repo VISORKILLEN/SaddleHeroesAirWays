@@ -335,5 +335,34 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Heathrow Airport", actual.ArrivalAirport);
             Assert.AreEqual("SH-101", actual.Flightnumber);
         }
+
+        [TestMethod]
+        public async Task UpdateBookingAsync_ValidRequest_ReturnSuccess()
+        {
+            using var context = CreateContext("UpdateBookingHappyPath");
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            
+            context.Flight.AddRange(
+                new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = DateTime.Now.AddDays(2), ArrivalTime = DateTime.Now.AddDays(2), TotalSeats = 150, Price = 150m },
+                new Flight { Id = 2, FlightNumber = "SH-102", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = DateTime.Now.AddDays(3), ArrivalTime = DateTime.Now.AddDays(3), TotalSeats = 150, Price = 200m }
+            );
+            
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = DateTime.Now, TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var request = new UpdateBooking(2);
+            var actual = await service.UpdateBookingAsync("BKG-001", request);
+
+            Assert.IsTrue(actual.Success);
+            Assert.AreEqual("Rebooked", actual.Data.BookingStatus);
+        }
     }
 }
