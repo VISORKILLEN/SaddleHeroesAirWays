@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SaddleHeroesAirWays.API.Controllers;
@@ -91,6 +92,65 @@ namespace SaddleHeroesAirWays.MSTest
             var badRequestResult = result.Result as BadRequestObjectResult;
             Assert.IsNotNull(badRequestResult, "Should return 400 Bad Request");
             Assert.AreEqual(400, badRequestResult.StatusCode);
+
+        }
+
+        [TestMethod]
+        public async Task GetAllUsersAlphabetical_ShouldReturnOkWithSortedUsers()
+        {
+            var mockUsers = new List<UserResponse>
+            {
+                new UserResponse(1, "Bob", "Adams", "bob@gmail.com", "0192334354"),
+                new UserResponse(2, "Alice", "Smith", "alice@gmail.com", "0192334355"),
+                new UserResponse(3, "Charlie", "Zane", "charlie@gmail.com", "0192334356")
+            };
+
+            _userServiceMock!
+                .Setup(s => s.GetAllUsersAlphabeticlyAsync())
+                .ReturnsAsync(mockUsers);
+
+            var result = await _userController!.GetAllUsersAlphabetical();
+
+            var okResult = result as OkObjectResult;
+
+            Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
+            Assert.AreEqual(200, okResult.StatusCode);
+
+            var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
+            Assert.IsNotNull(returnedUsers, "Expected the returned value to be a collection of UserResponse");
+
+            var returnedUserList = returnedUsers.ToList();
+            Assert.AreEqual(3, returnedUserList.Count);
+
+            Assert.AreEqual("Adams", returnedUserList[0].Lastname);
+            Assert.AreEqual("Smith", returnedUserList[1].Lastname);
+            Assert.AreEqual("Zane", returnedUserList[2].Lastname);
+
+        }
+
+        [TestMethod]
+        public async Task GetAllUsersAlphabetical_ReturnAListOfNullUsers_ReturnsOk()
+        {
+            var mockUsers = new List<UserResponse>
+            {
+            };
+
+            _userServiceMock!
+                .Setup(s => s.GetAllUsersAlphabeticlyAsync())
+                .ReturnsAsync(mockUsers);
+
+            var result = await _userController!.GetAllUsersAlphabetical();
+
+            var okResult = result as OkObjectResult;
+
+            Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
+            Assert.AreEqual(200, okResult.StatusCode);
+
+            var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
+            Assert.IsNotNull(returnedUsers, "Expected the returned value to be a collection of UserResponse");
+
+            var returnedUserList = returnedUsers.ToList();
+            Assert.AreEqual(0, returnedUserList.Count);
 
         }
     }
