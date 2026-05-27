@@ -24,6 +24,7 @@ namespace SaddleHeroesAirWays.MSTest
         }
 
         // Happy path test, verifies that the controller returns OK with available flights
+        [TestMethod]
         public async Task SearchAvailableFlights_NoCity_ReturnOK()
         {
             _mockFlightService
@@ -34,6 +35,23 @@ namespace SaddleHeroesAirWays.MSTest
                 });
 
             var result = await _controller.SearchAvailableFlights(null);
+
+            var ok = result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(200, ok.StatusCode);
+        }
+
+        //Happy path, city filter return 200 with filtirerd flights
+        [TestMethod]
+        public async Task SearchAvailableFlights_WithCity_ReturnOK()
+        {
+            _mockFlightService
+                .Setup(s => s.SearchAvailableFlightsAsync("Stockholm"))
+                .ReturnsAsync(new List<FlightResponse>
+                {
+                    new FlightResponse("SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, "Arrived")
+                });
+            var result = await _controller.SearchAvailableFlights("Stockholm");
 
             var ok = result as OkObjectResult;
             Assert.IsNotNull(ok);
