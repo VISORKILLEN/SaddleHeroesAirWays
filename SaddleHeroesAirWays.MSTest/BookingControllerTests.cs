@@ -318,5 +318,23 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(badRequestResult);
             Assert.AreEqual(400, badRequestResult.StatusCode);
         }
+
+        //happy path - 200 OK
+        [TestMethod]
+        public async Task GetBookingByBookingReference_ValidReference_ReturnsOk()
+        {
+            var bookingReference = "BKG-001";
+            var bookingResponse = new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), DateTime.Now, 150m, "Confirmed", null);
+
+            _mockBookingService
+                .Setup(s => s.GetBookingByBookingReferenceAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<BookingResponse>.Ok(bookingResponse));
+
+            var actual = await _controller.GetBookingByBookingReference(bookingReference);
+
+            var okResult = actual.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(200, okResult.StatusCode);
+        }
     }
 }
