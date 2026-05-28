@@ -118,5 +118,20 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(resultList);
             Assert.AreEqual(0, resultList.Count);
         }
+
+        // Happy path - existing user gets deleted
+        [TestMethod]
+        public async Task DeleteUser_ExistingUser_ReturnsTrue()
+        {
+            using var context = CreateContext("DeleteUserTest");
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan" });
+            context.SaveChanges();
+
+            var service = new UserService(context);
+            var result = await service.DeleteUserAsync(1);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(0, context.User.Count());
+        }
     }
 }

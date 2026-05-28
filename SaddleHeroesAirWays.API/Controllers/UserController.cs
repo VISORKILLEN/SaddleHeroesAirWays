@@ -51,7 +51,7 @@ namespace SaddleHeroesAirWays.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            if (id == 0)
+            if (id <= 0)
             {
                 return BadRequest("Invalid user id.");
             }
