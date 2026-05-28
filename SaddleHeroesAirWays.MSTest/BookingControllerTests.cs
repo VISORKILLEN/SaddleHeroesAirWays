@@ -253,5 +253,47 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(createdResult);
             Assert.AreEqual(201, createdResult.StatusCode);
         }
+
+        //Edge case - 404 flight dosent excists
+        [TestMethod]
+        public async Task CreateBooking_FlightNotFound_ReturnsNotFound()
+        {
+            var request = new CreateBookingRequest(1, 99, null);
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(request, default))
+                .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+
+            _mockBookingService
+                .Setup(s => s.CreateBookingAsync(request))
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Flyget finns inte."));
+
+            var actual = await _controller.CreateBooking(request);
+
+            var notFoundResult = actual.Result as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        //Edge case - 400 Flight is full
+        [TestMethod]
+        public async Task CreateBooking_FlightIsFull_ReturnsBadRequest()
+        {
+            var request = new CreateBookingRequest(1, 1, null);
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(request, default))
+                .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+
+            _mockBookingService
+                .Setup(s => s.CreateBookingAsync(request))
+                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Flyget är fullt."));
+
+            var actual = await _controller.CreateBooking(request);
+
+            var badRequestResult = actual.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+        }
     }
 }
