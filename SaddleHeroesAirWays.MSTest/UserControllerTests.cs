@@ -166,5 +166,18 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
         }
+
+        // Edge case, user not found returns 404
+        [TestMethod]
+        public async Task DeleteUser_UserNotFound_ReturnsNotFound()
+        {
+            _userServiceMock!
+                .Setup(s => s.DeleteUserAsync(99))
+                .ReturnsAsync(false);
+
+            var result = await _userController!.DeleteUser(99);
+
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+        }
     }
 }
