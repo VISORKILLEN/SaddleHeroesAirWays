@@ -102,9 +102,12 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.IsNotNull(badRequest);
             Assert.AreEqual(400, badRequest.StatusCode);
+
+            _mockBookingService.Verify(
+                s => s.GetBookingsByUserIdAsync(It.IsAny<int>()), Times.Never);
         }
 
-        //Edge case - verifies that controller returns the service once
+        //Edge case - Verifies that service is called once
         [TestMethod]
         public async Task GetBookingsByUserId_ValidUserId_VerifyServiceCalledOnce()
         {
@@ -214,6 +217,9 @@ namespace SaddleHeroesAirWays.MSTest
             var notFoundResult = result.Result as NotFoundObjectResult;
             Assert.IsNotNull(notFoundResult);
             Assert.AreEqual(404, notFoundResult.StatusCode);
+
+            _mockBookingService.Verify(
+                s => s.UpdateBookingAsync(bookingReference, updateBooking), Times.Once);
         }
 
         [TestMethod]
@@ -261,7 +267,7 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateBookingRequest(1, 99, null);
 
             _mockValidator
-                .Setup(v => v.ValidateAsync(request, default))
+                .Setup(v => v.ValidateAsync(request, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FluentValidation.Results.ValidationResult());
 
             _mockBookingService
@@ -282,7 +288,7 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateBookingRequest(1, 1, null);
 
             _mockValidator
-                .Setup(v => v.ValidateAsync(request, default))
+                .Setup(v => v.ValidateAsync(request, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FluentValidation.Results.ValidationResult());
 
             _mockBookingService
@@ -309,7 +315,7 @@ namespace SaddleHeroesAirWays.MSTest
             };
 
             _mockValidator
-                .Setup(v => v.ValidateAsync(request, default))
+                .Setup(v => v.ValidateAsync(request, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FluentValidation.Results.ValidationResult(validationFailures));
 
             var actual = await _controller.CreateBooking(request);
@@ -317,6 +323,8 @@ namespace SaddleHeroesAirWays.MSTest
             var badRequestResult = actual.Result as BadRequestObjectResult;
             Assert.IsNotNull(badRequestResult);
             Assert.AreEqual(400, badRequestResult.StatusCode);
+
+            _mockBookingService.Verify(s => s.CreateBookingAsync(It.IsAny<CreateBookingRequest>()),Times.Never);
         }
 
         //happy path - 200 OK
