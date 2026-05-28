@@ -270,14 +270,16 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateBookingRequest(1, 1, null);
             var actual = await service.CreateBookingAsync(request);
 
-            Assert.IsNotNull(actual);
-            Assert.AreEqual("Arthur", actual.Firstname);
-            Assert.AreEqual("Confirmed", actual.BookingStatus);
-            Assert.AreEqual(150m, actual.TotalPrice);
+            Assert.IsTrue(actual.Success);
+            Assert.IsNotNull(actual.Data);
+            Assert.AreEqual("Arthur", actual.Data!.Firstname);
+            Assert.AreEqual("Confirmed", actual.Data!.BookingStatus);
+            Assert.AreEqual(150m, actual.Data!.TotalPrice);
         }
+
         //Edge case - Flight finns inte - retunera null
         [TestMethod]
-        public async Task CreateBooking_FlightNotFound_ReturnNull()
+        public async Task CreateBooking_FlightNotFound_ReturnNotFound()
         {
             using var context = CreateContext("CreateBookingNoFLight");
 
@@ -285,11 +287,12 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateBookingRequest(1, 99, null);
             var actual = await service.CreateBookingAsync(request);
 
-            Assert.IsNull(actual);
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
         }
 
         [TestMethod]
-        public async Task CreateBooking_FlightIsFull_ReturnNull()
+        public async Task CreateBooking_FlightIsFull_ReturnValidationError()
         {
             using var context = CreateContext("CreateBookingFullFlight");
 
@@ -309,7 +312,8 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateBookingRequest(1, 1, null);
             var actual = await service.CreateBookingAsync(request);
 
-            Assert.IsNull(actual);
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.ValidationError, actual.Status);
         }
 
         [TestMethod]
@@ -331,10 +335,10 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateBookingRequest(1, 1, null);
             var actual = await service.CreateBookingAsync(request);
 
-            Assert.AreEqual("BKG-1001", actual.BookingReference);
-            Assert.AreEqual("Stockholm Arlanda", actual.DepartureAirport);
-            Assert.AreEqual("Heathrow Airport", actual.ArrivalAirport);
-            Assert.AreEqual("SH-101", actual.Flightnumber);
+            Assert.AreEqual("BKG-1001", actual.Data!.BookingReference);
+            Assert.AreEqual("Stockholm Arlanda", actual.Data!.DepartureAirport);
+            Assert.AreEqual("Heathrow Airport", actual.Data!.ArrivalAirport);
+            Assert.AreEqual("SH-101", actual.Data!.Flightnumber);
         }
 
         //ombokning lyckas
