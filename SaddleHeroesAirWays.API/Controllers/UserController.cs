@@ -46,5 +46,24 @@ namespace SaddleHeroesAirWays.API.Controllers
             var result = await _userService.GetAllUsersAlphabeticlyAsync();
             return Ok(result);
         }
+
+        //HttpDelete to delete one user.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid user id.");
+            }
+
+            var deleted = await _userService.DeleteUserAsync(id);
+
+            if (!deleted)
+            {
+                return NotFound($"User with id {id} was not found.");
+            }
+
+            return NoContent();
+        }
     }
 }

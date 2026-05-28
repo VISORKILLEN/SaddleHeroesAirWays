@@ -42,5 +42,19 @@ namespace SaddleHeroesAirWays.API.Services
 
             return users;
         }
+
+        public async Task<bool> DeleteUserAsync(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+
+            if(user == null)
+            {
+                return false;
+            }
+
+            _context.User.Remove(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
         Task<User> CreateUserAsync(CreateUser request);
 
         Task<IEnumerable<UserResponse>> GetAllUsersAlphabeticlyAsync();
+        Task<bool> DeleteUserAsync(int id);
     }
 }
