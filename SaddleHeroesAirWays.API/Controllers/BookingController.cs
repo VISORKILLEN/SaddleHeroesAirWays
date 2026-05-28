@@ -83,12 +83,19 @@ namespace SaddleHeroesAirWays.API.Controllers
             }
 
             var result = await _bookingService.CreateBookingAsync(bookingRequest);
-            if (result == null)
+            if (!result.Success)
             {
-                return BadRequest("Flyget hittades inte.");
+                return result.Status switch
+                {
+                    ServiceResultStatus.NotFound => NotFound(result.ErrorMessage),
+                    ServiceResultStatus.ValidationError => BadRequest(result.ErrorMessage),
+                    _ => StatusCode(500, result.ErrorMessage)
+                };
             }
 
-            return CreatedAtAction(nameof(GetBookingByBookingReference), new { bookingReference = result.BookingReference }, result);
+            return CreatedAtAction(nameof(GetBookingByBookingReference),
+                new { bookingReference = result.Data!.BookingReference },
+                result.Data);
         }
 
         [HttpPut("{bookingReference}")]

@@ -58,18 +58,18 @@ namespace SaddleHeroesAirWays.API.Services
                 .ToListAsync();
         }
 
-        public async Task<BookingResponse> CreateBookingAsync(CreateBookingRequest bookingRequest)
+        public async Task<ServiceResult<BookingResponse>> CreateBookingAsync(CreateBookingRequest bookingRequest)
         {
             var flight = await _context.Flight.FindAsync(bookingRequest.FlightId);
             
             if(flight == null)
             {
-                return null;
+                return ServiceResult<BookingResponse>.NotFound($"Flyget finns inte.");
             }
 
             if(await IsFlightFullAsync(bookingRequest.FlightId, flight.TotalSeats))
             {
-                return null;
+                return ServiceResult<BookingResponse>.ValidationError($"Flyget är fullt.");
             }
 
             var count = await _context.Booking.CountAsync();
@@ -111,7 +111,7 @@ namespace SaddleHeroesAirWays.API.Services
                 _context.Booking.Where(b => b.BookingReference == bookingToAdd.BookingReference))
                 .FirstOrDefaultAsync();
 
-            return createdBooking;
+            return ServiceResult<BookingResponse>.Ok(createdBooking); 
         }
 
         private async Task<bool> IsFlightFullAsync(int flightId, int totalSeats)
@@ -168,8 +168,9 @@ namespace SaddleHeroesAirWays.API.Services
                 return ServiceResult<BookingResponse>.NotFound($"Bokning {bookingReference} hittades inte.");
             }
 
-            var flight = await _context.Flight.FindAsync(booking.FlightId);
-            
+            var newFlightId = updateBooking.FlightId ?? booking.FlightId;
+            var flight = await _context.Flight.FindAsync(newFlightId);
+
             if (flight is null) 
             { 
                 return ServiceResult<BookingResponse>.NotFound("Flyget hittades inte.");
@@ -180,7 +181,7 @@ namespace SaddleHeroesAirWays.API.Services
                 return ServiceResult<BookingResponse>.ValidationError("Det går inte att omboka mindre än en timme innan avgång.");
             }
 
-            booking.FlightId = updateBooking.FlightId ?? booking.FlightId;
+            booking.FlightId = newFlightId;
             booking.BookingStatus = BookingStatus.Rebooked;
 
             await _context.SaveChangesAsync();
