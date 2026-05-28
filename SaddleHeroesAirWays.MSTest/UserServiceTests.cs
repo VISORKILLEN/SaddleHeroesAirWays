@@ -119,7 +119,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(0, resultList.Count);
         }
 
-        // Happy path - existing user gets deleted
+        // Happy path, existing user gets deleted
         [TestMethod]
         public async Task DeleteUser_ExistingUser_ReturnsTrue()
         {
@@ -132,6 +132,18 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.IsTrue(result);
             Assert.AreEqual(0, context.User.Count());
+        }
+
+        //Edge case, user does not exist return false
+        [TestMethod]
+        public async Task DeleteUser_UserNotFound_returnsFalse()
+        {
+            using var context = CreateContext("DeleteUserNotFoundTest");
+
+            var service = new UserService(context);
+            var result = await service.DeleteUserAsync(99);
+
+            Assert.IsFalse(result);
         }
     }
 }
