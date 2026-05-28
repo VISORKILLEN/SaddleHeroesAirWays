@@ -336,5 +336,39 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
         }
+
+        //Edge case - 404 booking dosent excists
+        [TestMethod]
+        public async Task GetBookingByBookingReference_InvalidReference_ReturnsNotFound()
+        {
+            var bookingReference = "BKG-999";
+
+            _mockBookingService
+                .Setup(s => s.GetBookingByBookingReferenceAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Bokning BKG-999 hittades inte."));
+
+            var actual = await _controller.GetBookingByBookingReference(bookingReference);
+
+            var notFoundResult = actual.Result as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        //Verify that service is called once
+        [TestMethod]
+        public async Task GetBookingByBookingReference_ValidReference_VerifyServiceCalledOnce()
+        {
+            var bookingReference = "BKG-001";
+            var bookingResponse = new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), DateTime.Now, 150m, "Confirmed", null);
+
+            _mockBookingService
+                .Setup(s => s.GetBookingByBookingReferenceAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<BookingResponse>.Ok(bookingResponse));
+
+            await _controller.GetBookingByBookingReference(bookingReference);
+
+            _mockBookingService.Verify(s => s.GetBookingByBookingReferenceAsync(bookingReference), Times.Once);
+        }
+
     }
 }
