@@ -444,6 +444,28 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
         }
 
-        
+        [TestMethod]
+        public async Task GetBookingByBookingReference_ValidReference_ReturnCorrectMappedData()
+        {
+            using var context = CreateContext("GetBookingByReferenceMappedData");
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 150, Price = 150m });
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = DateTime.Now, TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var actual = await service.GetBookingByBookingReferenceAsync("BKG-001");
+
+            Assert.AreEqual("Arthur", actual.Data!.Firstname);
+            Assert.AreEqual("Stockholm Arlanda", actual.Data!.DepartureAirport);
+            Assert.AreEqual("SH-101", actual.Data!.Flightnumber);
+            Assert.AreEqual("Confirmed", actual.Data!.BookingStatus);
+        }
     }
 }
