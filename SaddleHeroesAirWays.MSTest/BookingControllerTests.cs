@@ -295,5 +295,28 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(badRequestResult);
             Assert.AreEqual(400, badRequestResult.StatusCode);
         }
+
+        //Edge case - 400 invalid validation
+        [TestMethod]
+        public async Task CreateBooking_InvalidRequest_ReturnsBadRequest()
+        {
+            var request = new CreateBookingRequest(0, 0, null);
+
+            var validationFailures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new("UserId", "UserId måste vara ett positivt tal."),
+                new("FlightId", "FlightId måste vara ett positivt tal.")
+            };
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(request, default))
+                .ReturnsAsync(new FluentValidation.Results.ValidationResult(validationFailures));
+
+            var actual = await _controller.CreateBooking(request);
+
+            var badRequestResult = actual.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+        }
     }
 }
