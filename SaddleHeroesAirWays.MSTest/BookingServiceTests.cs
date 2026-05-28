@@ -386,7 +386,7 @@ namespace SaddleHeroesAirWays.MSTest
         }
 
         [TestMethod]
-        public async Task UpdateBookingAsync_TooLateToRebook_ReturnValidationError()
+        public async Task UpdateBooking_TooLateToRebook_ReturnValidationError()
         {
             using var context = CreateContext("UpdateBookingTooLate");
 
@@ -405,6 +405,29 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.IsFalse(actual.Success);
             Assert.AreEqual(ServiceResultStatus.ValidationError, actual.Status);
+        }
+
+        //Happy path - returns the booking with correct reference
+        [TestMethod]
+        public async Task GetBookingByBookingReference_ValidReference_ReturnSuccess()
+        {
+            using var context = CreateContext("GetBookingByReferenceHappyPath");
+
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = new DateTime(2026, 6, 1), ArrivalTime = new DateTime(2026, 6, 1), TotalSeats = 150, Price = 150m });
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = DateTime.Now, TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var actual = await service.GetBookingByBookingReferenceAsync("BKG-001");
+
+            Assert.IsTrue(actual.Success);
+            Assert.IsNotNull(actual.Data);
+            Assert.AreEqual("BKG-001", actual.Data.BookingReference);
         }
     }
 }
