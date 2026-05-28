@@ -429,5 +429,21 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(actual.Data);
             Assert.AreEqual("BKG-001", actual.Data.BookingReference);
         }
+
+        //Edge case - booking dosent excists returns not found
+        [TestMethod]
+        public async Task GetBookingByBookingReference_InvalidReference_ReturnNotFound()
+        {
+            using var context = CreateContext("GetBookingByReferenceNotFound");
+
+            var service = new BookingService(context);
+
+            var actual = await service.GetBookingByBookingReferenceAsync("BKG-999");
+
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
+        }
+
+        
     }
 }
