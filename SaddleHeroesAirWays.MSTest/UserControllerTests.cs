@@ -153,5 +153,18 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(0, returnedUserList.Count);
 
         }
+
+        // Happy path, valid id returns 204 NoContent
+        [TestMethod]
+        public async Task DeleteUser_ValidId_ReturnsNoContent()
+        {
+            _userServiceMock!
+                .Setup(s => s.DeleteUserAsync(1))
+                .ReturnsAsync(true);
+
+            var result = await _userController!.DeleteUser(1);
+
+            Assert.IsInstanceOfType(result, typeof(NoContentResult));
+        }
     }
 }
