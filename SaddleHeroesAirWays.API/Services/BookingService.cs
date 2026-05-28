@@ -37,11 +37,18 @@ namespace SaddleHeroesAirWays.API.Services
                 .ToListAsync();
         }
 
-        public async Task<BookingResponse?> GetBookingByBookingReferenceAsync(string bookingReference)
+        public async Task<ServiceResult<BookingResponse?>> GetBookingByBookingReferenceAsync(string bookingReference)
         {
-            return await MapBookingToResponse(
+            var booking = await MapBookingToResponse(
                 _context.Booking.AsNoTracking().Where(b => b.BookingReference == bookingReference))
                 .FirstOrDefaultAsync();
+
+            if(booking == null)
+            {
+                return ServiceResult<BookingResponse>.NotFound($"Bokning {bookingReference} hittades inte.");
+            }
+
+            return ServiceResult<BookingResponse>.Ok(booking);
         }
 
         public async Task<IEnumerable<BookingResponse>> GetBookingsByUserIdAsync(int userId)
