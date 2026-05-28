@@ -232,5 +232,143 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(badRequestResult);
             Assert.AreEqual(400, badRequestResult.StatusCode);
         }
+
+        //Happy path - 201 created
+        [TestMethod]
+        public async Task CreateBooking_ValidRequest_ReturnsCreated()
+        {
+            var request = new CreateBookingRequest(1, 1, null);
+            var bookingResponse = new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), DateTime.Now, 150m, "Confirmed", null);
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(request, default))
+                .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+
+            _mockBookingService.Setup(s => s.CreateBookingAsync(request))
+                .ReturnsAsync(ServiceResult<BookingResponse>.Ok(bookingResponse));
+
+            var actual = await _controller.CreateBooking(request);
+
+            var createdResult = actual.Result as CreatedAtActionResult;
+            Assert.IsNotNull(createdResult);
+            Assert.AreEqual(201, createdResult.StatusCode);
+        }
+
+        //Edge case - 404 flight dosent excists
+        [TestMethod]
+        public async Task CreateBooking_FlightNotFound_ReturnsNotFound()
+        {
+            var request = new CreateBookingRequest(1, 99, null);
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(request, default))
+                .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+
+            _mockBookingService
+                .Setup(s => s.CreateBookingAsync(request))
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Flyget finns inte."));
+
+            var actual = await _controller.CreateBooking(request);
+
+            var notFoundResult = actual.Result as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        //Edge case - 400 Flight is full
+        [TestMethod]
+        public async Task CreateBooking_FlightIsFull_ReturnsBadRequest()
+        {
+            var request = new CreateBookingRequest(1, 1, null);
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(request, default))
+                .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+
+            _mockBookingService
+                .Setup(s => s.CreateBookingAsync(request))
+                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Flyget är fullt."));
+
+            var actual = await _controller.CreateBooking(request);
+
+            var badRequestResult = actual.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+        }
+
+        //Edge case - 400 invalid validation
+        [TestMethod]
+        public async Task CreateBooking_InvalidRequest_ReturnsBadRequest()
+        {
+            var request = new CreateBookingRequest(0, 0, null);
+
+            var validationFailures = new List<FluentValidation.Results.ValidationFailure>
+            {
+                new("UserId", "UserId måste vara ett positivt tal."),
+                new("FlightId", "FlightId måste vara ett positivt tal.")
+            };
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(request, default))
+                .ReturnsAsync(new FluentValidation.Results.ValidationResult(validationFailures));
+
+            var actual = await _controller.CreateBooking(request);
+
+            var badRequestResult = actual.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+        }
+
+        //happy path - 200 OK
+        [TestMethod]
+        public async Task GetBookingByBookingReference_ValidReference_ReturnsOk()
+        {
+            var bookingReference = "BKG-001";
+            var bookingResponse = new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), DateTime.Now, 150m, "Confirmed", null);
+
+            _mockBookingService
+                .Setup(s => s.GetBookingByBookingReferenceAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<BookingResponse>.Ok(bookingResponse));
+
+            var actual = await _controller.GetBookingByBookingReference(bookingReference);
+
+            var okResult = actual.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(200, okResult.StatusCode);
+        }
+
+        //Edge case - 404 booking dosent excists
+        [TestMethod]
+        public async Task GetBookingByBookingReference_InvalidReference_ReturnsNotFound()
+        {
+            var bookingReference = "BKG-999";
+
+            _mockBookingService
+                .Setup(s => s.GetBookingByBookingReferenceAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Bokning BKG-999 hittades inte."));
+
+            var actual = await _controller.GetBookingByBookingReference(bookingReference);
+
+            var notFoundResult = actual.Result as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        //Verify that service is called once
+        [TestMethod]
+        public async Task GetBookingByBookingReference_ValidReference_VerifyServiceCalledOnce()
+        {
+            var bookingReference = "BKG-001";
+            var bookingResponse = new BookingResponse("BKG-001", "Arthur", "Morgan", "SH-101", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), DateTime.Now, 150m, "Confirmed", null);
+
+            _mockBookingService
+                .Setup(s => s.GetBookingByBookingReferenceAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<BookingResponse>.Ok(bookingResponse));
+
+            await _controller.GetBookingByBookingReference(bookingReference);
+
+            _mockBookingService.Verify(s => s.GetBookingByBookingReferenceAsync(bookingReference), Times.Once);
+        }
+
     }
 }
