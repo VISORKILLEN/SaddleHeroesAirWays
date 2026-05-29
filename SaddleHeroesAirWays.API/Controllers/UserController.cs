@@ -65,5 +65,22 @@ namespace SaddleHeroesAirWays.API.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserResponse>> GetUserById(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+
+            if (!user.Success)
+            {
+                return user.Status switch
+                {
+                    ServiceResultStatus.NotFound => NotFound(user.ErrorMessage),
+                    _ => StatusCode(500, user.ErrorMessage)
+                };
+            }
+
+            return Ok(user.Data);
+        }
     }
 }
