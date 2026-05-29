@@ -21,7 +21,7 @@ namespace SaddleHeroesAirWays.API.Controllers
         }
 
         [HttpPost("CreateUser")]
-        public async Task<ActionResult<User>> CreateUser(CreateUser userRequest)
+        public async Task<ActionResult<CreateUser>> CreateUser(CreateUser userRequest)
         {
             var validationResult = await _validator.ValidateAsync(userRequest);
 
@@ -36,7 +36,7 @@ namespace SaddleHeroesAirWays.API.Controllers
                 return BadRequest(errors);
             }
 
-            User newUser = await _userService.CreateUserAsync(userRequest);
+            var newUser = await _userService.CreateUserAsync(userRequest);
             return Ok(newUser);
         }
 
