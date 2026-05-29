@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SaddleHeroesAirWays.API;
 using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services;
@@ -144,6 +145,52 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await service.DeleteUserAsync(99);
 
             Assert.IsFalse(result);
+        }
+
+        //Happt path - returns user with valid id
+        [TestMethod]
+        public async Task GetUserById_ValidId_ReturnSuccess()
+        {
+            using var context = CreateContext("GetUserByIdHappyPath");
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com", Phonenumber = "555-0101" });
+            context.SaveChanges();
+
+            var service = new UserService(context);
+            var actual = await service.GetUserByIdAsync(1);
+
+            Assert.IsTrue(actual.Success);
+            Assert.IsNotNull(actual.Data);
+        }
+
+        //Correct mapping of user
+        [TestMethod]
+        public async Task GetUserById_ValidId_ReturnCorrectlyMappedData()
+        {
+            using var context = CreateContext("GetUserByIdMappedData");
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com", Phonenumber = "555-0101" });
+            context.SaveChanges();
+
+            var service = new UserService(context);
+            var actual = await service.GetUserByIdAsync(1);
+
+            Assert.AreEqual("Arthur", actual.Data!.Firstname);
+            Assert.AreEqual("Morgan", actual.Data!.Lastname);
+            Assert.AreEqual("arthur@test.com", actual.Data!.Email);
+        }
+
+        //Edge case - user dosent excists
+        [TestMethod]
+        public async Task GetUserById_InvalidId_ReturnNotFound()
+        {
+            using var context = CreateContext("GetUserByIdNotFound");
+
+            var service = new UserService(context);
+            var actual = await service.GetUserByIdAsync(99);
+
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
         }
     }
 }
