@@ -63,18 +63,6 @@ namespace SaddleHeroesAirWays.API.Services
             return true;
         }
 
-        private static IQueryable<UserResponse> MapUserToResponse(IQueryable<User> query)
-        {
-            return query.Select(u => new UserResponse(
-                u.Id,
-                u.Firstname,
-                u.Lastname,
-                u.Email,
-                u.Phonenumber
-            ));
-        }
-    }
-
         public async Task<ServiceResult<UserResponse>> GetUserByIdAsync(int id)
         {
             var user = await _context.User
@@ -96,5 +84,16 @@ namespace SaddleHeroesAirWays.API.Services
 
             return ServiceResult<UserResponse>.Ok(user);
         }
-  }
+
+        private static IQueryable<UserResponse> MapUserToResponse(IQueryable<User> query)
+        {
+            return query.Select(u => new UserResponse(
+                u.Id,
+                u.Firstname,
+                u.Lastname,
+                u.Email,
+                u.Phonenumber
+            ));
+        }
+    }
 }
