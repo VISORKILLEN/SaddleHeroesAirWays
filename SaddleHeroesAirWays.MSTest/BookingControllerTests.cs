@@ -11,11 +11,12 @@ namespace SaddleHeroesAirWays.MSTest
     [TestClass]
     public class BookingControllerUnitTests
     {
-        private readonly Mock<IBookingService> _mockBookingService;
-        private readonly Mock<IValidator<CreateBookingRequest>> _mockValidator;
-        private readonly BookingController _controller;
+        private Mock<IBookingService> _mockBookingService = null!;
+        private Mock<IValidator<CreateBookingRequest>> _mockValidator = null!;
+        private BookingController _controller = null!;
 
-        public BookingControllerUnitTests()
+        [TestInitialize]
+        public void Setup()
         {
             _mockBookingService = new Mock<IBookingService>();
             _mockValidator = new Mock<IValidator<CreateBookingRequest>>();
