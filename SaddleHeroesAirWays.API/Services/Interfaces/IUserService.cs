@@ -9,5 +9,7 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
 
         Task<IEnumerable<UserResponse>> GetAllUsersAlphabeticlyAsync();
         Task<bool> DeleteUserAsync(int id);
+
+        Task<ServiceResult<UserResponse>> GetUserByIdAsync(int id);
     }
 }

@@ -9,7 +9,7 @@ using SaddleHeroesAirWays.Library.Models;
 namespace SaddleHeroesAirWays.API.Services
 {
   public class UserService : IUserService
-    {
+  {
         private readonly DbContextAPI _context;
 
         public UserService(DbContextAPI context)
@@ -74,4 +74,27 @@ namespace SaddleHeroesAirWays.API.Services
             ));
         }
     }
+
+        public async Task<ServiceResult<UserResponse>> GetUserByIdAsync(int id)
+        {
+            var user = await _context.User
+                .AsNoTracking()
+                .Where(u => u.Id == id)
+                .Select(u => new UserResponse(
+                    u.Id,
+                    u.Firstname,
+                    u.Lastname,
+                    u.Email,
+                    u.Phonenumber
+                    ))
+                .FirstOrDefaultAsync();
+
+            if(user == null)
+            {
+                return ServiceResult<UserResponse>.NotFound($"Användare {id} hittades inte.");
+            }
+
+            return ServiceResult<UserResponse>.Ok(user);
+        }
+  }
 }

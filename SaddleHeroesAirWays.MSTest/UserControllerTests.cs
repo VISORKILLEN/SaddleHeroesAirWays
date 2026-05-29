@@ -14,13 +14,12 @@ namespace SaddleHeroesAirWays.MSTest
     [TestClass]
     public class UserControllerTests
     {
-        private Mock<IUserService>? _userServiceMock;
+        private Mock<IUserService> _userServiceMock = null!;
         private Mock<IValidator<CreateUser>> _validatorMock = null!;
-
-        private UserController? _userController;
+        private UserController _userController = null!;
 
         [TestInitialize]
-        public void setup()
+        public void Setup()
         {
             _validatorMock = new Mock<IValidator<CreateUser>>();
             _userServiceMock = new Mock<IUserService>();
@@ -112,7 +111,7 @@ namespace SaddleHeroesAirWays.MSTest
                 new UserResponse(3, "Charlie", "Zane", "charlie@gmail.com", "0192334356")
             };
 
-            _userServiceMock!
+            _userServiceMock
                 .Setup(s => s.GetAllUsersAlphabeticlyAsync())
                 .ReturnsAsync(mockUsers);
 
@@ -142,7 +141,7 @@ namespace SaddleHeroesAirWays.MSTest
             {
             };
 
-            _userServiceMock!
+            _userServiceMock
                 .Setup(s => s.GetAllUsersAlphabeticlyAsync())
                 .ReturnsAsync(mockUsers);
 
@@ -165,7 +164,7 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task DeleteUser_ValidId_ReturnsNoContent()
         {
-            _userServiceMock!
+            _userServiceMock
                 .Setup(s => s.DeleteUserAsync(1))
                 .ReturnsAsync(true);
 
@@ -178,13 +177,61 @@ namespace SaddleHeroesAirWays.MSTest
         [TestMethod]
         public async Task DeleteUser_UserNotFound_ReturnsNotFound()
         {
-            _userServiceMock!
+            _userServiceMock
                 .Setup(s => s.DeleteUserAsync(99))
                 .ReturnsAsync(false);
 
             var result = await _userController!.DeleteUser(99);
 
             Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+        }
+
+        //Happy path - 200 ok
+        [TestMethod]
+        public async Task GetUserById_ValidId_ReturnsOk()
+        {
+            var userResponse = new UserResponse(1, "Arthur", "Morgan", "arthur@test.com", "555-0101");
+
+            _userServiceMock
+                .Setup(s => s.GetUserByIdAsync(1))
+                .ReturnsAsync(ServiceResult<UserResponse>.Ok(userResponse));
+
+            var actual = await _userController.GetUserById(1);
+
+            var okResult = actual.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(200, okResult.StatusCode);
+        }
+
+        //User dosent excists - 404
+        [TestMethod]
+        public async Task GetUserById_InvalidId_ReturnsNotFound()
+        {
+            _userServiceMock
+                .Setup(s => s.GetUserByIdAsync(99))
+                .ReturnsAsync(ServiceResult<UserResponse>.NotFound("Användare 99 hittades inte."));
+
+            var actual = await _userController.GetUserById(99);
+
+            var notFoundResult = actual.Result as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        //verify - the service is called only once
+        [TestMethod]
+        public async Task GetUserById_ValidId_VerifyServiceCalledOnce()
+        {
+            var id = 1;
+            var userResponse = new UserResponse(id, "Arthur", "Morgan", "arthur@test.com", "555-0101");
+
+            _userServiceMock
+                .Setup(s => s.GetUserByIdAsync(id))
+                .ReturnsAsync(ServiceResult<UserResponse>.Ok(userResponse));
+
+            await _userController.GetUserById(1);
+
+            _userServiceMock.Verify(s => s.GetUserByIdAsync(id), Times.Once);
         }
     }
 }

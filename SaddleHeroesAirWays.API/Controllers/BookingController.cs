@@ -64,7 +64,6 @@ namespace SaddleHeroesAirWays.API.Controllers
                 {
                     ServiceResultStatus.NotFound => NotFound(booking.ErrorMessage),
                     _ => StatusCode(500, booking.ErrorMessage)
-
                 };
             }
 
