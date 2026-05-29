@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SaddleHeroesAirWays.API.DTOs;
+using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 
 namespace SaddleHeroesAirWays.API.Controllers
@@ -21,6 +23,23 @@ namespace SaddleHeroesAirWays.API.Controllers
             }
 
             return Ok(flights);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<FlightResponse>> GetFlightById(int id)
+        {
+            var flight = await _flightService.GetFlightByIdAsync(id);
+
+            if (!flight.Success)
+            {
+                return flight.Status switch
+                {
+                    ServiceResultStatus.NotFound => NotFound(flight.ErrorMessage),
+                    _ => StatusCode(500, flight.ErrorMessage)
+                };
+            }
+
+            return Ok(flight.Data);
         }
     }
 }

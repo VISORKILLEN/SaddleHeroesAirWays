@@ -5,8 +5,7 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
 {
     public interface IFlightService
     {
-        // IFlightService.cs
         Task<IEnumerable<FlightResponse>> SearchAvailableFlightsAsync(string? city = null);
-
+        Task<ServiceResult<FlightResponse>> GetFlightByIdAsync(int id);
     }
 }
