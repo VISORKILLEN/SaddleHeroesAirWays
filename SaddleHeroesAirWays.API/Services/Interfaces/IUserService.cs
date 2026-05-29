@@ -5,7 +5,7 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<User> CreateUserAsync(CreateUser request);
+        Task<IEnumerable<CreateUser>> CreateUserAsync(CreateUser request);
 
         Task<IEnumerable<UserResponse>> GetAllUsersAlphabeticlyAsync();
         Task<bool> DeleteUserAsync(int id);
