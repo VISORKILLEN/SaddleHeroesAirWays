@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SaddleHeroesAirWays.API.Controllers;
 using SaddleHeroesAirWays.API.DTOs;
+using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
 using SaddleHeroesAirWays.Library.Models;
 
@@ -38,13 +39,15 @@ namespace SaddleHeroesAirWays.MSTest
                  SocialSecurityNumber: "19900101-1234"
             );
 
-            var createdUser = new User
-            {
-                Firstname = "John",
-                Lastname = "Doe",
-                Email = "john.doe@example.com",
-                SocialSecurityNumber = "19900101-1234"
-            };
+            var createdUserResponse = new UserResponse(
+                 1,
+                 "John",
+                 "Doe",
+                 "john.doe@example.com",
+                 "123-456-7890"
+            );
+
+            var serviceResult = ServiceResult<UserResponse>.Ok(createdUserResponse);
 
             _validatorMock
                 .Setup(v => v.ValidateAsync(createUserRequest, It.IsAny<CancellationToken>()))
@@ -52,7 +55,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             _userServiceMock
                 .Setup(s => s.CreateUserAsync(createUserRequest))
-                .ReturnsAsync(createdUser);
+                .ReturnsAsync(serviceResult);
 
             var result = await _userController.CreateUser(createUserRequest);
 
@@ -61,9 +64,13 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(okResult, "Förväntad att controllern kommer returna OK() result :)");
             Assert.AreEqual(200, okResult.StatusCode);
 
-            var returnedUser = okResult.Value as User;
-            Assert.IsNotNull(returnedUser);
-            Assert.AreEqual("19900101-1234", returnedUser.SocialSecurityNumber);
+            var returnedResult = okResult.Value as ServiceResult<UserResponse>;
+
+            Assert.IsNotNull(returnedResult, "förväntat att värded som är returned är en ServiceResult<UserResponse>");
+            Assert.IsNotNull(returnedResult.Data);
+
+            Assert.AreEqual("john.doe@example.com", returnedResult.Data.Email);
+            Assert.AreEqual("John", returnedResult.Data.Firstname);
         }
 
         [TestMethod]
