@@ -25,6 +25,7 @@ namespace SaddleHeroesAirWays.API.Services
 
             return await query
                 .Select(f => new FlightResponse(
+                    f.Id,
                     f.FlightNumber,
                     f.DepartureAirport.Name,
                     f.ArrivalAirport.Name,
@@ -32,9 +33,36 @@ namespace SaddleHeroesAirWays.API.Services
                     f.ArrivalTime,
                     f.TotalSeats - f.Bookings.Count,
                     f.Price,
-                    f.FlightStatus.ToString()
+                    f.FlightStatus
                 ))
                 .ToListAsync();
+        }
+
+        public async Task <ServiceResult<FlightResponse>> GetFlightByIdAsync(int id)
+        {
+            var flight = await _context.Flight
+                .AsNoTracking()
+                .Where(f => f.Id == id)
+                .Select(f => new FlightResponse(
+                    f.Id,
+                    f.FlightNumber,
+                    f.DepartureAirport.Name,
+                    f.ArrivalAirport.Name,
+                    f.DepartureTime,
+                    f.ArrivalTime,
+                    f.TotalSeats,
+                    f.Price,
+                    f.FlightStatus
+                    ))
+                .FirstOrDefaultAsync();
+
+            if (flight == null)
+            {
+                return ServiceResult<FlightResponse>.NotFound("Flyget hittades inte.");
+
+            }
+
+            return ServiceResult<FlightResponse>.Ok(flight);
         }
     }
 }
