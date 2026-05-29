@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services.Interfaces;
@@ -14,7 +16,7 @@ namespace SaddleHeroesAirWays.API.Services
         {
             _context = context;
         }
-        public async Task<User> CreateUserAsync(CreateUser request)
+        public async Task<ServiceResult<UserResponse?>> CreateUserAsync(CreateUser request)
         {
             var newUser = new User
             {
@@ -24,13 +26,17 @@ namespace SaddleHeroesAirWays.API.Services
                 Email = request.Email,
                 Phonenumber = request.Phonenumber,
                 SocialSecurityNumber = request.SocialSecurityNumber,
-                IsAdmin = false                             
+                IsAdmin = false
             };
 
             await _context.User.AddAsync(newUser);
             await _context.SaveChangesAsync();
 
-            return newUser;
+            var createdUser = await MapUserToResponse(
+               _context.User.Where(u => u.Id == newUser.Id))
+               .FirstOrDefaultAsync();
+
+            return ServiceResult<UserResponse>.Ok(createdUser);
         }
 
         public async Task<IEnumerable<UserResponse>> GetAllUsersAlphabeticlyAsync()
@@ -55,6 +61,17 @@ namespace SaddleHeroesAirWays.API.Services
             _context.User.Remove(user);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        private static IQueryable<UserResponse> MapUserToResponse(IQueryable<User> query)
+        {
+            return query.Select(u => new UserResponse(
+                u.Id,
+                u.Firstname,
+                u.Lastname,
+                u.Email,
+                u.Phonenumber
+            ));
         }
     }
 }

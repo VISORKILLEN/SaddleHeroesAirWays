@@ -21,7 +21,7 @@ namespace SaddleHeroesAirWays.API.Controllers
         }
 
         [HttpPost("CreateUser")]
-        public async Task<ActionResult<CreateUser>> CreateUser(CreateUser userRequest)
+        public async Task<ActionResult<UserResponse>> CreateUser(CreateUser userRequest)
         {
             var validationResult = await _validator.ValidateAsync(userRequest);
 
@@ -36,8 +36,8 @@ namespace SaddleHeroesAirWays.API.Controllers
                 return BadRequest(errors);
             }
 
-            var newUser = await _userService.CreateUserAsync(userRequest);
-            return Ok(newUser);
+            var serviceResult = await _userService.CreateUserAsync(userRequest);
+            return Ok(serviceResult);
         }
 
         [HttpGet("GetUsersInAlphabeticalOrder")]

@@ -41,13 +41,14 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await service.CreateUserAsync(request);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual("John", result.Firstname);
-            Assert.AreEqual("Doe", result.Lastname);
-            Assert.IsFalse(result.IsAdmin);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual("John", result.Data.Firstname);
+            Assert.AreEqual("Doe", result.Data.Lastname);
 
             var dbUsers = await context.User.ToListAsync();
             Assert.AreEqual(1, dbUsers.Count);
             Assert.AreEqual("john.doe@example.com", dbUsers.First().Email);
+            Assert.IsFalse(dbUsers.First().IsAdmin);
         }
 
         [TestMethod]
@@ -69,8 +70,8 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await service.CreateUserAsync(request);
 
             Assert.IsNotNull(result);
-            Assert.IsNotNull(result.Email);
-            Assert.IsNull(result.Lastname);
+            Assert.IsNotNull(result.Data.Email);
+            Assert.IsNull(result.Data.Lastname);
 
             var dbUsers = await context.User.ToListAsync();
             Assert.AreEqual(1, dbUsers.Count);
