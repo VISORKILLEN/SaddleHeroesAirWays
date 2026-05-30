@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Azure.Core;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -61,17 +62,16 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController.CreateUser(createUserRequest);
 
             var okResult = result.Result as OkObjectResult;
-
             Assert.IsNotNull(okResult, "Förväntad att controllern kommer returna OK() result :)");
             Assert.AreEqual(200, okResult.StatusCode);
 
             var returnedResult = okResult.Value as ServiceResult<UserResponse>;
-
             Assert.IsNotNull(returnedResult, "förväntat att värded som är returned är en ServiceResult<UserResponse>");
             Assert.IsNotNull(returnedResult.Data);
-
             Assert.AreEqual("john.doe@example.com", returnedResult.Data.Email);
             Assert.AreEqual("John", returnedResult.Data.Firstname);
+
+            _userServiceMock.Verify(s => s.CreateUserAsync(createUserRequest), Times.Once);
         }
 
         [TestMethod]
@@ -98,8 +98,10 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController.CreateUser(badCreateUserRequest);
 
             var badRequestResult = result.Result as BadRequestObjectResult;
-            Assert.IsNotNull(badRequestResult, "Should return 400 Bad Request");
+            Assert.IsNotNull(badRequestResult, "Borde returnera 400 Bad Request");
             Assert.AreEqual(400, badRequestResult.StatusCode);
+
+            _userServiceMock.Verify(s => s.CreateUserAsync(It.IsAny<CreateUser>()), Times.Never);
         }
 
         [TestMethod]
@@ -116,45 +118,42 @@ namespace SaddleHeroesAirWays.MSTest
                 .Setup(s => s.GetAllUsersAlphabeticlyAsync())
                 .ReturnsAsync(mockUsers);
 
-            var result = await _userController!.GetAllUsersAlphabetical();
+            var result = await _userController.GetAllUsersAlphabetical();
 
             var okResult = result as OkObjectResult;
-
             Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
             Assert.AreEqual(200, okResult.StatusCode);
 
             var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
-            Assert.IsNotNull(returnedUsers, "Expected the returned value to be a collection of UserResponse");
+            Assert.IsNotNull(returnedUsers, "Förväntad att returnera en collection av userResponse");
 
             var returnedUserList = returnedUsers.ToList();
             Assert.AreEqual(3, returnedUserList.Count);
-
             Assert.AreEqual("Adams", returnedUserList[0].Lastname);
             Assert.AreEqual("Smith", returnedUserList[1].Lastname);
             Assert.AreEqual("Zane", returnedUserList[2].Lastname);
+
+            _userServiceMock.Verify(s => s.GetAllUsersAlphabeticlyAsync(), Times.Once);
         }
 
         [TestMethod]
         public async Task GetAllUsersAlphabetical_ReturnAListOfNullUsers_ReturnsOk()
         {
-            var mockUsers = new List<UserResponse>();
-
             _userServiceMock
                 .Setup(s => s.GetAllUsersAlphabeticlyAsync())
-                .ReturnsAsync(mockUsers);
+                .ReturnsAsync(new List<UserResponse>());
 
             var result = await _userController!.GetAllUsersAlphabetical();
 
             var okResult = result as OkObjectResult;
-
             Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
             Assert.AreEqual(200, okResult.StatusCode);
 
             var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
             Assert.IsNotNull(returnedUsers, "Expected the returned value to be a collection of UserResponse");
+            Assert.AreEqual(0, returnedUsers.Count(), "Expected the list to be empty.");
 
-            var returnedUserList = returnedUsers.ToList();
-            Assert.AreEqual(0, returnedUserList.Count);
+            _userServiceMock.Verify(s => s.GetAllUsersAlphabeticlyAsync(), Times.Once);
         }
 
         // Happy path, valid id returns 204 NoContent

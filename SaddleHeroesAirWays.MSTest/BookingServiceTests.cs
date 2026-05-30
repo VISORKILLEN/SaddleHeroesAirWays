@@ -467,5 +467,51 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("SH-101", actual.Data!.Flightnumber);
             Assert.AreEqual("Confirmed", actual.Data!.BookingStatus);
         }
+
+        [TestMethod]
+        public async Task DeleteBookingPermanently_ValidReference_ReturnsSuccessAndDeletesBooking()
+        {
+            using var context = CreateContext("DeleteBookingHappyPath");
+
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            context.Airport.AddRange(
+                new Airport { Id = 1, IATACode = "ARN", Name = "Stockholm Arlanda", City = "Stockholm", Country = "Sweden" },
+                new Airport { Id = 2, IATACode = "LHR", Name = "Heathrow Airport", City = "London", Country = "UK" }
+            );
+            context.Flight.Add(new Flight { Id = 1, FlightNumber = "SH-101", DepartureAirportId = 1, ArrivalAirportId = 2, DepartureTime = DateTime.Now, ArrivalTime = DateTime.Now, TotalSeats = 150, Price = 150m });
+
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = DateTime.Now, TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+            context.BookingDetails.Add(new BookingDetails { Id = 1, BookingReference = "BKG-001", Seatnumber = "1A", Baggage = true, Notes = "Test" });
+
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+
+            var result = await service.DeleteBookingPermanentlyAsync("BKG-001");
+
+            Assert.IsTrue(result.Success, "Förväntade att borttagningen skulle lyckas.");
+            Assert.IsTrue(result.Data, "Förväntade true i Data.");
+
+            Assert.AreEqual(0, context.Booking.Count(), "Bokningen togs inte bort från databasen.");
+            Assert.AreEqual(0, context.BookingDetails.Count(), "Bokningsdetaljerna togs inte bort från databasen.");
+        }
+
+        [TestMethod]
+        public async Task DeleteBookingPermanently_BookingNotFound_ReturnsNotFound()
+        {
+            using var context = CreateContext("DeleteBookingNotFound");
+
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", UserId = 1, FlightId = 1, BookingDate = DateTime.Now, TotalPrice = 150m, BookingStatus = BookingStatus.Confirmed });
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+
+            var result = await service.DeleteBookingPermanentlyAsync("BKG-999");
+
+            Assert.IsFalse(result.Success, "Förväntade att det skulle misslyckas då bokningen inte finns.");
+            Assert.AreEqual(ServiceResultStatus.NotFound, result.Status);
+
+            Assert.AreEqual(1, context.Booking.Count(), "Fel bokning togs bort.");
+        }
     }
 }

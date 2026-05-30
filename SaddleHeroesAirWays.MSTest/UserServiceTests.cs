@@ -62,17 +62,21 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateUser(
                 Gender: "Male",
                 Firstname: "John",
-                Lastname: null,
+                Lastname: null, // no lastname
                 Email: "", //No mail
-                Phonenumber: "123-456-7890",
+                Phonenumber: null, //no number :)
                 SocialSecurityNumber: "19900101-1234"
                 );
 
             var result = await service.CreateUserAsync(request);
 
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(result.Data);
+
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Data.Email);
             Assert.IsNull(result.Data.Lastname);
+            Assert.IsNull(result.Data.Phonenumber);
 
             var dbUsers = await context.User.ToListAsync();
             Assert.AreEqual(1, dbUsers.Count);
@@ -85,9 +89,9 @@ namespace SaddleHeroesAirWays.MSTest
             var service = new UserService(context);
 
             await context.User.AddRangeAsync(
-                new User { Firstname = "Alice", Lastname = "Zane", Email = "alice@example.com", SocialSecurityNumber = "1234567890" },
-                new User { Firstname = "Bob", Lastname = "Adams", Email = "bob@example.com", SocialSecurityNumber = "2345678901" },
-                new User { Firstname = "Charlie", Lastname = "Smith", Email = "charlie@example.com", SocialSecurityNumber = "3456789012" }
+                new User { Firstname = "Alice", Lastname = "Zane", Email = "alice@example.com", Phonenumber = "1233456789", SocialSecurityNumber = "1234567890"},
+                new User { Firstname = "Bob", Lastname = "Adams", Email = "bob@example.com", Phonenumber = "2233456789", SocialSecurityNumber = "2345678901" },
+                new User { Firstname = "Charlie", Lastname = "Smith", Email = "charlie@example.com", Phonenumber = "3233456789", SocialSecurityNumber = "3456789012" }
             );
             await context.SaveChangesAsync();
 
@@ -101,6 +105,10 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Adams", resultList[0].Lastname);
             Assert.AreEqual("Smith", resultList[1].Lastname);
             Assert.AreEqual("Zane", resultList[2].Lastname);
+
+            Assert.AreEqual("1233456789", resultList[2].Phonenumber);
+            Assert.AreEqual("bob@example.com", resultList[0].Email);
+            Assert.AreEqual("Charlie", resultList[1].Firstname);
         }
 
         [TestMethod]
@@ -109,15 +117,14 @@ namespace SaddleHeroesAirWays.MSTest
             using var context = CreateContext("GetUsersAlphabeticlyTestNoUsers");
             var service = new UserService(context);
 
-            await context.User.AddRangeAsync();
-
-            await context.SaveChangesAsync();
+            var dbCount = await context.User.CountAsync();
+            Assert.AreEqual(0, dbCount, "Databasen borde vara tom :D");
 
             var result = await service.GetAllUsersAlphabeticlyAsync();
-
             var resultList = result.ToList();
 
             Assert.IsNotNull(resultList);
+            Assert.IsInstanceOfType(result, typeof(IEnumerable<UserResponse>));
             Assert.AreEqual(0, resultList.Count);
         }
 
