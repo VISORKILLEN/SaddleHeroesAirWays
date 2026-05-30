@@ -14,10 +14,13 @@ namespace SaddleHeroesAirWays.API.Controllers
         private readonly IUserService _userService;
         private readonly IValidator<CreateUser> _validator;
 
-        public UserController(IUserService IuserService, IValidator<CreateUser> validator)
+        private readonly IValidator<UpdateUser> _updateValidator;
+
+        public UserController(IUserService userService, IValidator<CreateUser> validator, IValidator<UpdateUser> updateValidator)
         {
-            _userService = IuserService;
+            _userService = userService;
             _validator = validator;
+            _updateValidator = updateValidator;
         }
 
         [HttpPost("CreateUser")]
@@ -87,8 +90,17 @@ namespace SaddleHeroesAirWays.API.Controllers
         public async Task<IActionResult> UpdateUser(int id, UpdateUser request)
         {
             if (id <= 0)
-            {
                 return BadRequest("Invalid user id.");
+
+            var validationResult = await _updateValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(error => new
+                {
+                    field = error.PropertyName,
+                    message = error.ErrorMessage
+                });
+                return BadRequest(errors);
             }
 
             var result = await _userService.UpdateUserAsync(id, request);

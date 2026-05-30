@@ -39,6 +39,36 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
+        // Edge case - GetWeeklyBookings no bookings for that week returns empty list
+        [TestMethod]
+        public async Task GetWeeklyBookings_NoBookingsForWeek_ReturnsOkWithEmptyList()
+        {
+            var date = new DateTime(2026, 1, 1);
+            _mockBookingService
+                .Setup(s => s.GetBookingsForWeekAsync(date))
+                .ReturnsAsync(new List<BookingResponse>());
+
+            var result = await _controller.GetWeeklyBookings(date);
+
+            var ok = result.Result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(0, (ok.Value as IEnumerable<BookingResponse>).Count());
+        }
+
+        // Edge case, GetWeeklyBookings service called exactly once
+        [TestMethod]
+        public async Task GetWeeklyBookings_ValidDate_VerifyServiceCalledOnce()
+        {
+            var date = new DateTime(2026, 5, 12);
+            _mockBookingService
+                .Setup(s => s.GetBookingsForWeekAsync(date))
+                .ReturnsAsync(new List<BookingResponse>());
+
+            await _controller.GetWeeklyBookings(date);
+
+            _mockBookingService.Verify(s => s.GetBookingsForWeekAsync(date), Times.Once);
+        }
+
         // Happy path test - verifies that the controller returns OK for monthly bookings
         [TestMethod]
         public async Task GetMonthlyBookings_ReturnsOk()
@@ -53,6 +83,36 @@ namespace SaddleHeroesAirWays.MSTest
             var okResult = result.Result as OkObjectResult;
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
+        }
+
+        // Edge case - GetMonthlyBookings no bookings for that month returns empty list
+        [TestMethod]
+        public async Task GetMonthlyBookings_NoBookingsForMonth_ReturnsOkWithEmptyList()
+        {
+            var date = new DateTime(2026, 1, 1);
+            _mockBookingService
+                .Setup(s => s.GetBookingsForMonthAsync(date))
+                .ReturnsAsync(new List<BookingResponse>());
+
+            var result = await _controller.GetMonthlyBookings(date);
+
+            var ok = result.Result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(0, (ok.Value as IEnumerable<BookingResponse>).Count());
+        }
+
+        // Edge case - GetMonthlyBookings service called exactly once
+        [TestMethod]
+        public async Task GetMonthlyBookings_ValidDate_VerifyServiceCalledOnce()
+        {
+            var date = new DateTime(2026, 6, 10);
+            _mockBookingService
+                .Setup(s => s.GetBookingsForMonthAsync(date))
+                .ReturnsAsync(new List<BookingResponse>());
+
+            await _controller.GetMonthlyBookings(date);
+
+            _mockBookingService.Verify(s => s.GetBookingsForMonthAsync(date), Times.Once);
         }
 
         //Happy path test - returning OK with correct data
@@ -148,6 +208,24 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(okResult);
             Assert.AreEqual(200, okResult.StatusCode);
         }
+
+        // Edge case - GetAllBookings - no bookings in system returns empty list
+        [TestMethod]
+        public async Task GetAllBookings_NoBookingsInSystem_ReturnsOkWithEmptyList()
+        {
+            var mockService = new Mock<IBookingService>();
+            mockService
+                .Setup(s => s.GetAllBookingsMadeAsync())
+                .ReturnsAsync(new List<BookingResponse>());
+
+            var controller = new BookingController(mockService.Object, _mockValidator.Object);
+            var result = await controller.GetAllBookings();
+
+            var ok = result.Result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(0, (ok.Value as IEnumerable<BookingResponse>).Count());
+        }
+
 
         // Happy path - valid date range returns OK
         [TestMethod]
