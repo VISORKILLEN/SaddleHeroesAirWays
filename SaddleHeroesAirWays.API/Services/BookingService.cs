@@ -205,6 +205,11 @@ namespace SaddleHeroesAirWays.API.Services
             var booking = await _context.Booking
                 .FirstOrDefaultAsync(b => b.BookingReference == bookingReference);
 
+            if (booking == null)
+            {
+                return ServiceResult<bool>.NotFound($"Bokning {bookingReference} hittades inte.");
+            }
+
             _context.Booking.Remove(booking);
             await _context.SaveChangesAsync();
 
