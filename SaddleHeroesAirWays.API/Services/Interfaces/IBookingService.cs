@@ -14,5 +14,7 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
         Task<IEnumerable<BookingResponse>> GetBookingsForDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<ServiceResult<BookingResponse>> CreateBookingAsync(CreateBookingRequest request);
         Task<ServiceResult<BookingResponse?>> UpdateBookingAsync(string bookingReference, UpdateBooking updateBooking);
+
+        Task<ServiceResult<bool>> DeleteBookingPermanentlyAsync(string bookingReference);
     }
 }
