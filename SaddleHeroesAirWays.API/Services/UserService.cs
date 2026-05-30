@@ -96,12 +96,12 @@ namespace SaddleHeroesAirWays.API.Services
             ));
         }
 
-        public async Task<User?> UpdateUserAsync(int id, UpdateUser request)
+        public async Task<ServiceResult<User?>> UpdateUserAsync(int id, UpdateUser request)
         {
             var user = await _context.User.FindAsync(id);
 
             if (user == null)
-                return null;
+                return ServiceResult<User?>.NotFound($"User with id {id} was not found.");
 
             user.Firstname = request.Firstname ?? user.Firstname;
             user.Lastname = request.Lastname ?? user.Lastname;
@@ -109,7 +109,7 @@ namespace SaddleHeroesAirWays.API.Services
             user.Phonenumber = request.Phonenumber ?? user.Phonenumber;
 
             await _context.SaveChangesAsync();
-            return user;
+            return ServiceResult<User?>.Ok(user);
         }
     }
 }
