@@ -233,5 +233,51 @@ namespace SaddleHeroesAirWays.MSTest
 
             _userServiceMock.Verify(s => s.GetUserByIdAsync(id), Times.Once);
         }
+
+        // Happy path - valid update returns 200
+        [TestMethod]
+        public async Task UpdateUser_ValidId_ReturnsOk()
+        {
+            var request = new UpdateUser("John", "Doe", "john@test.com", null);
+            var updatedUser = new User { Id = 1, Firstname = "John", Lastname = "Doe", Email = "john@test.com" };
+
+            _userServiceMock!
+                .Setup(s => s.UpdateUserAsync(1, request))
+                .ReturnsAsync(ServiceResult<User>.Ok(updatedUser));
+
+            var result = await _userController!.UpdateUser(1, request);
+
+            var ok = result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(200, ok.StatusCode);
+        }
+
+        // Edge case - user not found returns 404
+        [TestMethod]
+        public async Task UpdateUser_UserNotFound_ReturnsNotFound()
+        {
+            var request = new UpdateUser("John", null, null, null);
+
+            _userServiceMock!
+                .Setup(s => s.UpdateUserAsync(99, request))
+                .ReturnsAsync(ServiceResult<User>.NotFound("User with id 99 was not found."));
+
+            var result = await _userController!.UpdateUser(99, request);
+
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+        }
+
+        // Edge case - invalid id returns 400 without calling service
+        [TestMethod]
+        public async Task UpdateUser_InvalidId_ReturnsBadRequest()
+        {
+            var request = new UpdateUser("John", null, null, null);
+
+            var result = await _userController!.UpdateUser(-1, request);
+
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            _userServiceMock!.Verify(s => s.UpdateUserAsync(
+                It.IsAny<int>(), It.IsAny<UpdateUser>()), Times.Never);
+        }
     }
 }

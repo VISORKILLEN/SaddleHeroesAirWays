@@ -193,5 +193,35 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsFalse(actual.Success);
             Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
         }
+
+        // Happy path - existing user gets updated
+        [TestMethod]
+        public async Task UpdateUser_ExistingUser_ReturnsUpdatedUser()
+        {
+            using var context = CreateContext("UpdateUserTest");
+            context.User.Add(new User { Id = 1, Firstname = "Arthur", Lastname = "Morgan", Email = "arthur@test.com" });
+            context.SaveChanges();
+
+            var service = new UserService(context);
+            var result = await service.UpdateUserAsync(1, new UpdateUser("John", "Doe", "john@test.com", null));
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual("John", result.Data.Firstname);
+            Assert.AreEqual("john@test.com", result.Data.Email);
+            Assert.AreEqual("Doe", result.Data.Lastname);
+        }
+
+        // Edge case - user not found returns null
+        [TestMethod]
+        public async Task UpdateUser_UserNotFound_ReturnsNotFound()
+        {
+            using var context = CreateContext("UpdateUserNotFoundTest");
+
+            var service = new UserService(context);
+            var result = await service.UpdateUserAsync(99, new UpdateUser("John", null, null, null));
+
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ServiceResultStatus.NotFound, result.Status);
+        }
     }
 }

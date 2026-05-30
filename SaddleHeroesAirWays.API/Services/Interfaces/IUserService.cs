@@ -11,5 +11,7 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
         Task<bool> DeleteUserAsync(int id);
 
         Task<ServiceResult<UserResponse>> GetUserByIdAsync(int id);
+
+        Task<ServiceResult<User?>> UpdateUserAsync(int id, UpdateUser request);
     }
 }
