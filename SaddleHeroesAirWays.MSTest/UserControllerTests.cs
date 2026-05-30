@@ -16,14 +16,16 @@ namespace SaddleHeroesAirWays.MSTest
     {
         private Mock<IUserService> _userServiceMock = null!;
         private Mock<IValidator<CreateUser>> _validatorMock = null!;
+        private Mock<IValidator<UpdateUser>> _updateValidatorMock = null!;
         private UserController _userController = null!;
 
         [TestInitialize]
         public void Setup()
         {
             _validatorMock = new Mock<IValidator<CreateUser>>();
+            _updateValidatorMock = new Mock<IValidator<UpdateUser>>();
             _userServiceMock = new Mock<IUserService>();
-            _userController = new UserController(_userServiceMock.Object, _validatorMock.Object);
+            _userController = new UserController(_userServiceMock.Object, _validatorMock.Object, _updateValidatorMock.Object);
         }
 
         [TestMethod]
@@ -98,7 +100,6 @@ namespace SaddleHeroesAirWays.MSTest
             var badRequestResult = result.Result as BadRequestObjectResult;
             Assert.IsNotNull(badRequestResult, "Should return 400 Bad Request");
             Assert.AreEqual(400, badRequestResult.StatusCode);
-
         }
 
         [TestMethod]
@@ -131,15 +132,12 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Adams", returnedUserList[0].Lastname);
             Assert.AreEqual("Smith", returnedUserList[1].Lastname);
             Assert.AreEqual("Zane", returnedUserList[2].Lastname);
-
         }
 
         [TestMethod]
         public async Task GetAllUsersAlphabetical_ReturnAListOfNullUsers_ReturnsOk()
         {
-            var mockUsers = new List<UserResponse>
-            {
-            };
+            var mockUsers = new List<UserResponse>();
 
             _userServiceMock
                 .Setup(s => s.GetAllUsersAlphabeticlyAsync())
@@ -157,7 +155,6 @@ namespace SaddleHeroesAirWays.MSTest
 
             var returnedUserList = returnedUsers.ToList();
             Assert.AreEqual(0, returnedUserList.Count);
-
         }
 
         // Happy path, valid id returns 204 NoContent
@@ -186,7 +183,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
         }
 
-        //Happy path - 200 ok
+        // Happy path - 200 ok
         [TestMethod]
         public async Task GetUserById_ValidId_ReturnsOk()
         {
@@ -203,7 +200,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
-        //User dosent excists - 404
+        // User doesnt exist - 404
         [TestMethod]
         public async Task GetUserById_InvalidId_ReturnsNotFound()
         {
@@ -218,7 +215,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(404, notFoundResult.StatusCode);
         }
 
-        //verify - the service is called only once
+        // Verify - the service is called only once
         [TestMethod]
         public async Task GetUserById_ValidId_VerifyServiceCalledOnce()
         {
@@ -241,6 +238,10 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new UpdateUser("John", "Doe", "john@test.com", null);
             var updatedUser = new User { Id = 1, Firstname = "John", Lastname = "Doe", Email = "john@test.com" };
 
+            _updateValidatorMock
+                .Setup(v => v.ValidateAsync(request, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
             _userServiceMock!
                 .Setup(s => s.UpdateUserAsync(1, request))
                 .ReturnsAsync(ServiceResult<User>.Ok(updatedUser));
@@ -257,6 +258,10 @@ namespace SaddleHeroesAirWays.MSTest
         public async Task UpdateUser_UserNotFound_ReturnsNotFound()
         {
             var request = new UpdateUser("John", null, null, null);
+
+            _updateValidatorMock
+                .Setup(v => v.ValidateAsync(request, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
 
             _userServiceMock!
                 .Setup(s => s.UpdateUserAsync(99, request))
