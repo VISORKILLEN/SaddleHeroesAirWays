@@ -90,8 +90,17 @@ namespace SaddleHeroesAirWays.API.Controllers
         public async Task<IActionResult> UpdateUser(int id, UpdateUser request)
         {
             if (id <= 0)
-            {
                 return BadRequest("Invalid user id.");
+
+            var validationResult = await _updateValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(error => new
+                {
+                    field = error.PropertyName,
+                    message = error.ErrorMessage
+                });
+                return BadRequest(errors);
             }
 
             var result = await _userService.UpdateUserAsync(id, request);
