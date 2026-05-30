@@ -181,6 +181,24 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
+        // Edge case - GetAllBookings - no bookings in system returns empty list
+        [TestMethod]
+        public async Task GetAllBookings_NoBookingsInSystem_ReturnsOkWithEmptyList()
+        {
+            var mockService = new Mock<IBookingService>();
+            mockService
+                .Setup(s => s.GetAllBookingsMadeAsync())
+                .ReturnsAsync(new List<BookingResponse>());
+
+            var controller = new BookingController(mockService.Object, _mockValidator.Object);
+            var result = await controller.GetAllBookings();
+
+            var ok = result.Result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(0, (ok.Value as IEnumerable<BookingResponse>).Count());
+        }
+
+
         // Happy path - valid date range returns OK
         [TestMethod]
         public async Task GetBookingsByDateRange_ValidDates_ReturnsOk()
