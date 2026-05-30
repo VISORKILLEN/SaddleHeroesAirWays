@@ -23,6 +23,15 @@ namespace SaddleHeroesAirWays.MSTest
             _controller = new FlightController(_mockFlightService.Object);
         }
 
+        public enum FlightStatus
+        {
+            Scheduled,
+            Boarding,
+            Departed,
+            Arrived,
+            Cancelled
+        }
+
         // Happy path test, verifies that the controller returns OK with available flights
         [TestMethod]
         public async Task SearchAvailableFlights_NoCity_ReturnOK()
@@ -31,7 +40,7 @@ namespace SaddleHeroesAirWays.MSTest
                 .Setup(s => s.SearchAvailableFlightsAsync(null))
                 .ReturnsAsync(new List<FlightResponse>
                 {
-                    new FlightResponse("SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, "Arrived")
+                    new FlightResponse(1, "SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, FlightStatus.Arrived)
                 });
 
             var result = await _controller.SearchAvailableFlights(null);
@@ -49,7 +58,7 @@ namespace SaddleHeroesAirWays.MSTest
                 .Setup(s => s.SearchAvailableFlightsAsync("Stockholm"))
                 .ReturnsAsync(new List<FlightResponse>
                 {
-                    new FlightResponse("SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, "Arrived")
+                    new FlightResponse(1, "SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, FlightStatus.Arrived)
                 });
             var result = await _controller.SearchAvailableFlights("Stockholm");
 
