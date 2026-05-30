@@ -98,7 +98,7 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController.CreateUser(badCreateUserRequest);
 
             var badRequestResult = result.Result as BadRequestObjectResult;
-            Assert.IsNotNull(badRequestResult, "Should return 400 Bad Request");
+            Assert.IsNotNull(badRequestResult, "Borde returnera 400 Bad Request");
             Assert.AreEqual(400, badRequestResult.StatusCode);
 
             _userServiceMock.Verify(s => s.CreateUserAsync(It.IsAny<CreateUser>()), Times.Never);
@@ -126,7 +126,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
 
             var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
-            Assert.IsNotNull(returnedUsers, "Expected the returned value to be a collection of UserResponse");
+            Assert.IsNotNull(returnedUsers, "Förväntad att returnera en collection av userResponse");
 
             var returnedUserList = returnedUsers.ToList();
             Assert.AreEqual(3, returnedUserList.Count);
