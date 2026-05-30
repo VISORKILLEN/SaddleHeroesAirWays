@@ -100,6 +100,8 @@ namespace SaddleHeroesAirWays.MSTest
             var badRequestResult = result.Result as BadRequestObjectResult;
             Assert.IsNotNull(badRequestResult, "Should return 400 Bad Request");
             Assert.AreEqual(400, badRequestResult.StatusCode);
+
+            _userServiceMock.Verify(s => s.CreateUserAsync(It.IsAny<CreateUser>()), Times.Never);
         }
 
         [TestMethod]
