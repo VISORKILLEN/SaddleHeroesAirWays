@@ -95,5 +95,21 @@ namespace SaddleHeroesAirWays.API.Services
                 u.Phonenumber
             ));
         }
+
+        public async Task<User?> UpdateUserAsync(int id, UpdateUser request)
+        {
+            var user = await _context.User.FindAsync(id);
+
+            if (user == null)
+                return null;
+
+            user.Firstname = request.Firstname ?? user.Firstname;
+            user.Lastname = request.Lastname ?? user.Lastname;
+            user.Email = request.Email ?? user.Email;
+            user.Phonenumber = request.Phonenumber ?? user.Phonenumber;
+
+            await _context.SaveChangesAsync();
+            return user;
+        }
     }
 }
