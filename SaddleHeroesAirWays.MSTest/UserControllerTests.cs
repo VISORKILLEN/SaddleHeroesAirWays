@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Azure.Core;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -61,17 +62,16 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController.CreateUser(createUserRequest);
 
             var okResult = result.Result as OkObjectResult;
-
             Assert.IsNotNull(okResult, "Förväntad att controllern kommer returna OK() result :)");
             Assert.AreEqual(200, okResult.StatusCode);
 
             var returnedResult = okResult.Value as ServiceResult<UserResponse>;
-
             Assert.IsNotNull(returnedResult, "förväntat att värded som är returned är en ServiceResult<UserResponse>");
             Assert.IsNotNull(returnedResult.Data);
-
             Assert.AreEqual("john.doe@example.com", returnedResult.Data.Email);
             Assert.AreEqual("John", returnedResult.Data.Firstname);
+
+            _userServiceMock.Verify(s => s.CreateUserAsync(createUserRequest), Times.Once);
         }
 
         [TestMethod]

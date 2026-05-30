@@ -106,9 +106,9 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Smith", resultList[1].Lastname);
             Assert.AreEqual("Zane", resultList[2].Lastname);
 
-            Assert.AreEqual("1233456789", resultList[0].Phonenumber);
-            Assert.AreEqual("bob@example.com", resultList[1].Email);
-            Assert.AreEqual("Charlie", resultList[2].Firstname);
+            Assert.AreEqual("1233456789", resultList[2].Phonenumber);
+            Assert.AreEqual("bob@example.com", resultList[0].Email);
+            Assert.AreEqual("Charlie", resultList[1].Firstname);
         }
 
         [TestMethod]
