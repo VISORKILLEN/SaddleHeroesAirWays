@@ -5,6 +5,7 @@ using SaddleHeroesAirWays.API.Controllers;
 using SaddleHeroesAirWays.API.DTOs;
 using SaddleHeroesAirWays.API.Services;
 using SaddleHeroesAirWays.API.Services.Interfaces;
+using SaddleHeroesAirWays.Library.Models;
 
 namespace SaddleHeroesAirWays.MSTest
 {
@@ -455,6 +456,41 @@ namespace SaddleHeroesAirWays.MSTest
             await _controller.GetBookingByBookingReference(bookingReference);
 
             _mockBookingService.Verify(s => s.GetBookingByBookingReferenceAsync(bookingReference), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task DeleteBooking_ShouldDeleteABooking_ReturnNull()
+        {
+            var bookingReference = "BKG-001";
+
+            _mockBookingService
+                .Setup(s => s.DeleteBookingPermanentlyAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<bool>.Ok(true));
+
+            var result = await _controller.DeleteBooking(bookingReference);
+
+            Assert.IsInstanceOfType(result.Result, typeof(NoContentResult), "Förväntat 204 NoContent när borttagningen är klar");
+
+            _mockBookingService.Verify(s => s.DeleteBookingPermanentlyAsync(bookingReference), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task DeleteBooking_BookingNotFound_ReturnsNotFound()
+        {
+            var bookingReference = "BKG-999";
+
+            _mockBookingService
+               .Setup(s => s.DeleteBookingPermanentlyAsync(bookingReference))
+               .ReturnsAsync(ServiceResult<bool>.NotFound("Bokningen hittades inte"));
+
+            var result = await _controller.DeleteBooking(bookingReference);
+
+            var notFoundResult = result.Result as NotFoundObjectResult;
+
+            Assert.IsNotNull(notFoundResult, "Förväntat 404 NotFound när bokningen inte finns");
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+
+            _mockBookingService.Verify(s => s.DeleteBookingPermanentlyAsync(bookingReference), Times.Once);
         }
 
     }
