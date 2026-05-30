@@ -14,10 +14,13 @@ namespace SaddleHeroesAirWays.API.Controllers
         private readonly IUserService _userService;
         private readonly IValidator<CreateUser> _validator;
 
-        public UserController(IUserService IuserService, IValidator<CreateUser> validator)
+        private readonly IValidator<UpdateUser> _updateValidator;
+
+        public UserController(IUserService userService, IValidator<CreateUser> validator, IValidator<UpdateUser> updateValidator)
         {
-            _userService = IuserService;
+            _userService = userService;
             _validator = validator;
+            _updateValidator = updateValidator;
         }
 
         [HttpPost("CreateUser")]
