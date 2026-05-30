@@ -82,5 +82,11 @@ namespace SaddleHeroesAirWays.API.Controllers
 
             return Ok(user.Data);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, Updateuser request)
+        {
+
+        }
     }
 }
