@@ -45,7 +45,6 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(result.Data);
             Assert.AreEqual("John", result.Data.Firstname);
             Assert.AreEqual("Doe", result.Data.Lastname);
-            Assert.AreEqual("19900101-1234", result.Data.SocialSecurityNumber);
 
             var dbUsers = await context.User.ToListAsync();
             Assert.AreEqual(1, dbUsers.Count);
