@@ -210,5 +210,17 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("john@test.com", result.Data.Email);
             Assert.AreEqual("Doe", result.Data.Lastname);
         }
+
+        // Edge case - user not found returns null
+        [TestMethod]
+        public async Task UpdateUser_UserNotFound_ReturnsNull()
+        {
+            using var context = CreateContext("UpdateUserNotFoundTest");
+
+            var service = new UserService(context);
+            var result = await service.UpdateUserAsync(99, new UpdateUser("John", null, null, null));
+
+            Assert.IsNull(result);
+        }
     }
 }
