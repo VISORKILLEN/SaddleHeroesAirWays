@@ -84,9 +84,15 @@ namespace SaddleHeroesAirWays.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, Updateuser request)
+        public async Task<IActionResult> UpdateUser(int id, UpdateUser request)
         {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid user id.");
+            }
+            var updateUser = await _userService.UpdateUserAsync(id, request);
 
+            return Ok(updateUser);
         }
     }
 }
