@@ -266,5 +266,18 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
         }
+
+        // Edge case - invalid id returns 400 without calling service
+        [TestMethod]
+        public async Task UpdateUser_InvalidId_ReturnsBadRequest()
+        {
+            var request = new UpdateUser("John", null, null, null);
+
+            var result = await _userController!.UpdateUser(-1, request);
+
+            Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+            _userServiceMock!.Verify(s => s.UpdateUserAsync(
+                It.IsAny<int>(), It.IsAny<UpdateUser>()), Times.Never);
+        }
     }
 }
