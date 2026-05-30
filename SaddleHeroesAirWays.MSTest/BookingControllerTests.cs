@@ -71,6 +71,22 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
+        // Edge case - GetMonthlyBookings - no bookings for that month returns empty list
+        [TestMethod]
+        public async Task GetMonthlyBookings_NoBookingsForMonth_ReturnsOkWithEmptyList()
+        {
+            var date = new DateTime(2026, 1, 1);
+            _mockBookingService
+                .Setup(s => s.GetBookingsForMonthAsync(date))
+                .ReturnsAsync(new List<BookingResponse>());
+
+            var result = await _controller.GetMonthlyBookings(date);
+
+            var ok = result.Result as OkObjectResult;
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(0, (ok.Value as IEnumerable<BookingResponse>).Count());
+        }
+
         //Happy path test - returning OK with correct data
         [TestMethod]
         public async Task GetBookingsByUserId_ValidUserId_ReturnsOk()
