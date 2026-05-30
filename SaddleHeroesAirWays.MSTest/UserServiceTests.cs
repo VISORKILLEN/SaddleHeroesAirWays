@@ -45,6 +45,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(result.Data);
             Assert.AreEqual("John", result.Data.Firstname);
             Assert.AreEqual("Doe", result.Data.Lastname);
+            Assert.AreEqual("19900101-1234", result.Data.SocialSecurityNumber);
 
             var dbUsers = await context.User.ToListAsync();
             Assert.AreEqual(1, dbUsers.Count);
@@ -62,17 +63,21 @@ namespace SaddleHeroesAirWays.MSTest
             var request = new CreateUser(
                 Gender: "Male",
                 Firstname: "John",
-                Lastname: null,
+                Lastname: null, // no lastname
                 Email: "", //No mail
-                Phonenumber: "123-456-7890",
+                Phonenumber: null, //no number :)
                 SocialSecurityNumber: "19900101-1234"
                 );
 
             var result = await service.CreateUserAsync(request);
 
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(result.Data);
+
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Data.Email);
             Assert.IsNull(result.Data.Lastname);
+            Assert.IsNull(result.Data.Phonenumber);
 
             var dbUsers = await context.User.ToListAsync();
             Assert.AreEqual(1, dbUsers.Count);
