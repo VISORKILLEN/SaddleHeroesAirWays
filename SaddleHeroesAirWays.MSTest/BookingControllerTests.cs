@@ -85,7 +85,7 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual(200, okResult.StatusCode);
         }
 
-        // Edge case - GetMonthlyBookings - no bookings for that month returns empty list
+        // Edge case - GetMonthlyBookings no bookings for that month returns empty list
         [TestMethod]
         public async Task GetMonthlyBookings_NoBookingsForMonth_ReturnsOkWithEmptyList()
         {
@@ -99,6 +99,20 @@ namespace SaddleHeroesAirWays.MSTest
             var ok = result.Result as OkObjectResult;
             Assert.IsNotNull(ok);
             Assert.AreEqual(0, (ok.Value as IEnumerable<BookingResponse>).Count());
+        }
+
+        // Edge case - GetMonthlyBookings service called exactly once
+        [TestMethod]
+        public async Task GetMonthlyBookings_ValidDate_VerifyServiceCalledOnce()
+        {
+            var date = new DateTime(2026, 6, 10);
+            _mockBookingService
+                .Setup(s => s.GetBookingsForMonthAsync(date))
+                .ReturnsAsync(new List<BookingResponse>());
+
+            await _controller.GetMonthlyBookings(date);
+
+            _mockBookingService.Verify(s => s.GetBookingsForMonthAsync(date), Times.Once);
         }
 
         //Happy path test - returning OK with correct data
