@@ -89,9 +89,9 @@ namespace SaddleHeroesAirWays.MSTest
             var service = new UserService(context);
 
             await context.User.AddRangeAsync(
-                new User { Firstname = "Alice", Lastname = "Zane", Email = "alice@example.com", SocialSecurityNumber = "1234567890" },
-                new User { Firstname = "Bob", Lastname = "Adams", Email = "bob@example.com", SocialSecurityNumber = "2345678901" },
-                new User { Firstname = "Charlie", Lastname = "Smith", Email = "charlie@example.com", SocialSecurityNumber = "3456789012" }
+                new User { Firstname = "Alice", Lastname = "Zane", Email = "alice@example.com", Phonenumber = "1233456789", SocialSecurityNumber = "1234567890"},
+                new User { Firstname = "Bob", Lastname = "Adams", Email = "bob@example.com", Phonenumber = "2233456789", SocialSecurityNumber = "2345678901" },
+                new User { Firstname = "Charlie", Lastname = "Smith", Email = "charlie@example.com", Phonenumber = "3233456789", SocialSecurityNumber = "3456789012" }
             );
             await context.SaveChangesAsync();
 
@@ -105,6 +105,12 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("Adams", resultList[0].Lastname);
             Assert.AreEqual("Smith", resultList[1].Lastname);
             Assert.AreEqual("Zane", resultList[2].Lastname);
+
+            Assert.AreEqual("1233456789", resultList[0].Phonenumber);
+            Assert.AreEqual("bob@example.com", resultList[1].Email);
+            Assert.AreEqual("Charlie", resultList[2].Firstname);
+
+
         }
 
         [TestMethod]
