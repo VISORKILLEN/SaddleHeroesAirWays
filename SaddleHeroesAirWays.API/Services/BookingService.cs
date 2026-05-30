@@ -200,6 +200,28 @@ namespace SaddleHeroesAirWays.API.Services
            return ServiceResult<BookingResponse>.Ok(updatedBooking);
         }
 
+        public async Task<ServiceResult<bool>> DeleteBookingPermanentlyAsync(string bookingReference)
+        {
+            var booking = await _context.Booking
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingReference == bookingReference);
+
+            if (booking == null)
+            {
+                return ServiceResult<bool>.NotFound($"Bokning {bookingReference} hittades inte.");
+            }
+
+            if (booking.BookingDetails != null && booking.BookingDetails.Any())
+            {
+                _context.BookingDetails.RemoveRange(booking.BookingDetails);
+            }
+
+            _context.Booking.Remove(booking);
+            await _context.SaveChangesAsync();
+
+            return ServiceResult<bool>.Ok(true);
+        }
+
         private static IQueryable<BookingResponse> MapBookingToResponse(IQueryable<Booking> query)
         {
             return query.Select(b => new BookingResponse(

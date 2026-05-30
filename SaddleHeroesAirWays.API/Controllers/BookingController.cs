@@ -57,8 +57,8 @@ namespace SaddleHeroesAirWays.API.Controllers
         public async Task<ActionResult<BookingResponse?>> GetBookingByBookingReference(string bookingReference)
         {
             var booking = await _bookingService.GetBookingByBookingReferenceAsync(bookingReference);
-            
-            if(!booking.Success)
+
+            if (!booking.Success)
             {
                 return booking.Status switch
                 {
@@ -131,6 +131,23 @@ namespace SaddleHeroesAirWays.API.Controllers
 
             var bookings = await _bookingService.GetBookingsForDateRangeAsync(startDate, endDate);
             return Ok(bookings);
+        }
+
+        [HttpDelete("{bookingReference}")]
+        public async Task<ActionResult<BookingResponse>> DeleteBooking(string bookingReference)
+        {
+            var result = await _bookingService.DeleteBookingPermanentlyAsync(bookingReference);
+
+            if (!result.Success)
+            {
+                return result.Status switch
+                {
+                    ServiceResultStatus.NotFound => NotFound(result.ErrorMessage),
+                    _ => StatusCode(500, result.ErrorMessage)
+                };
+            }
+
+            return NoContent();
         }
     }
 }
