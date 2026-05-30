@@ -118,10 +118,9 @@ namespace SaddleHeroesAirWays.MSTest
                 .Setup(s => s.GetAllUsersAlphabeticlyAsync())
                 .ReturnsAsync(mockUsers);
 
-            var result = await _userController!.GetAllUsersAlphabetical();
+            var result = await _userController.GetAllUsersAlphabetical();
 
             var okResult = result as OkObjectResult;
-
             Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
             Assert.AreEqual(200, okResult.StatusCode);
 
@@ -130,33 +129,31 @@ namespace SaddleHeroesAirWays.MSTest
 
             var returnedUserList = returnedUsers.ToList();
             Assert.AreEqual(3, returnedUserList.Count);
-
             Assert.AreEqual("Adams", returnedUserList[0].Lastname);
             Assert.AreEqual("Smith", returnedUserList[1].Lastname);
             Assert.AreEqual("Zane", returnedUserList[2].Lastname);
+
+            _userServiceMock.Verify(s => s.GetAllUsersAlphabeticlyAsync(), Times.Once);
         }
 
         [TestMethod]
         public async Task GetAllUsersAlphabetical_ReturnAListOfNullUsers_ReturnsOk()
         {
-            var mockUsers = new List<UserResponse>();
-
             _userServiceMock
                 .Setup(s => s.GetAllUsersAlphabeticlyAsync())
-                .ReturnsAsync(mockUsers);
+                .ReturnsAsync(new List<UserResponse>());
 
             var result = await _userController!.GetAllUsersAlphabetical();
 
             var okResult = result as OkObjectResult;
-
             Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
             Assert.AreEqual(200, okResult.StatusCode);
 
             var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
             Assert.IsNotNull(returnedUsers, "Expected the returned value to be a collection of UserResponse");
+            Assert.AreEqual(0, returnedUsers.Count(), "Expected the list to be empty.");
 
-            var returnedUserList = returnedUsers.ToList();
-            Assert.AreEqual(0, returnedUserList.Count);
+            _userServiceMock.Verify(s => s.GetAllUsersAlphabeticlyAsync(), Times.Once);
         }
 
         // Happy path, valid id returns 204 NoContent
