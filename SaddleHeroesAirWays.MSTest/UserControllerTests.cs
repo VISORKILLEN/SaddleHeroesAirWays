@@ -251,5 +251,20 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.IsNotNull(ok);
             Assert.AreEqual(200, ok.StatusCode);
         }
+
+        // Edge case - user not found returns 404
+        [TestMethod]
+        public async Task UpdateUser_UserNotFound_ReturnsNotFound()
+        {
+            var request = new UpdateUser("John", null, null, null);
+
+            _userServiceMock!
+                .Setup(s => s.UpdateUserAsync(99, request))
+                .ReturnsAsync(ServiceResult<User>.NotFound("User with id 99 was not found."));
+
+            var result = await _userController!.UpdateUser(99, request);
+
+            Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+        }
     }
 }
