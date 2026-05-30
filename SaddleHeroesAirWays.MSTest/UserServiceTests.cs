@@ -109,8 +109,6 @@ namespace SaddleHeroesAirWays.MSTest
             Assert.AreEqual("1233456789", resultList[0].Phonenumber);
             Assert.AreEqual("bob@example.com", resultList[1].Email);
             Assert.AreEqual("Charlie", resultList[2].Firstname);
-
-
         }
 
         [TestMethod]
@@ -119,15 +117,14 @@ namespace SaddleHeroesAirWays.MSTest
             using var context = CreateContext("GetUsersAlphabeticlyTestNoUsers");
             var service = new UserService(context);
 
-            await context.User.AddRangeAsync();
-
-            await context.SaveChangesAsync();
+            var dbCount = await context.User.CountAsync();
+            Assert.AreEqual(0, dbCount, "Databasen borde vara tom :D");
 
             var result = await service.GetAllUsersAlphabeticlyAsync();
-
             var resultList = result.ToList();
 
             Assert.IsNotNull(resultList);
+            Assert.IsInstanceOfType(result, typeof(IEnumerable<UserResponse>));
             Assert.AreEqual(0, resultList.Count);
         }
 
