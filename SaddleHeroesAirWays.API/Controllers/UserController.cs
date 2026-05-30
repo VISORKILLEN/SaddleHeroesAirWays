@@ -90,9 +90,15 @@ namespace SaddleHeroesAirWays.API.Controllers
             {
                 return BadRequest("Invalid user id.");
             }
-            var updateUser = await _userService.UpdateUserAsync(id, request);
 
-            return Ok(updateUser);
+            var result = await _userService.UpdateUserAsync(id, request);
+
+            return result.Status switch
+            {
+                ServiceResultStatus.Success => Ok(result.Data),
+                ServiceResultStatus.NotFound => NotFound(result.ErrorMessage),
+                _ => BadRequest(result.ErrorMessage)
+            };
         }
     }
 }
