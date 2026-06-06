@@ -493,5 +493,54 @@ namespace SaddleHeroesAirWays.MSTest
             _mockBookingService.Verify(s => s.DeleteBookingPermanentlyAsync(bookingReference), Times.Once);
         }
 
+        //Happy path - 204 NoContent
+        [TestMethod]
+        public async Task CancelBooking_ValidReference_ReturnsNoContent()
+        {
+            var bookingReference = "BKG-001";
+
+            _mockBookingService
+                .Setup(s => s.CancelBookingAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<bool>.Ok(true));
+
+            var actual = await _controller.CancelBooking(bookingReference);
+
+            Assert.IsInstanceOfType(actual, typeof(NoContentResult));
+        }
+
+        //Edge case - 404 booking doesn't exist
+        [TestMethod]
+        public async Task CancelBooking_BookingNotFound_ReturnsNotFound()
+        {
+            var bookingReference = "BKG-999";
+
+            _mockBookingService
+                .Setup(s => s.CancelBookingAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<bool>.NotFound("Bokningen hittades inte."));
+
+            var actual = await _controller.CancelBooking(bookingReference);
+
+            var notFoundResult = actual as NotFoundObjectResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
+        }
+
+        //Edge case - 400 booking is already cancelled
+        [TestMethod]
+        public async Task CancelBooking_AlreadyCancelled_ReturnsBadRequest()
+        {
+            var bookingReference = "BKG-001";
+
+            _mockBookingService
+                .Setup(s => s.CancelBookingAsync(bookingReference))
+                .ReturnsAsync(ServiceResult<bool>.ValidationError("Bokningen är redan avbokad."));
+
+            var actual = await _controller.CancelBooking(bookingReference);
+
+            var badRequestResult = actual as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+        }
+
     }
 }
