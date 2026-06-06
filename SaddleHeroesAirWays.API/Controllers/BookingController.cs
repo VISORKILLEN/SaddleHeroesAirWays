@@ -149,5 +149,24 @@ namespace SaddleHeroesAirWays.API.Controllers
 
             return NoContent();
         }
+
+
+        [HttpPatch("{bookingReference}/cancel")]
+        public async Task<IActionResult> CancelBooking(string bookingReference)
+        {
+            var result = await _bookingService.CancelBookingAsync(bookingReference);
+
+            if (!result.Success)
+            {
+                if (result.Status == ServiceResultStatus.NotFound)
+                {
+                    return NotFound(result.ErrorMessage);
+                }
+
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return NoContent(); 
+        }
     }
 }

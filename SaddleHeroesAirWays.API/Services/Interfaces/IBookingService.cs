@@ -16,5 +16,6 @@ namespace SaddleHeroesAirWays.API.Services.Interfaces
         Task<ServiceResult<BookingResponse?>> UpdateBookingAsync(string bookingReference, UpdateBooking updateBooking);
 
         Task<ServiceResult<bool>> DeleteBookingPermanentlyAsync(string bookingReference);
+        Task<ServiceResult<bool>> CancelBookingAsync(string bookingReference);
     }
 }

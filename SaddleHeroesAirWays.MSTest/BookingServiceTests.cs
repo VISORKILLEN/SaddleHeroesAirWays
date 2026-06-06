@@ -513,5 +513,50 @@ namespace SaddleHeroesAirWays.MSTest
 
             Assert.AreEqual(1, context.Booking.Count(), "Fel bokning togs bort.");
         }
+
+        //Happy path - cancels an active booking successfully
+        [TestMethod]
+        public async Task CancelBookingAsync_ValidReference_ReturnsOkAndChangesStatus()
+        {
+            using var context = CreateContext("CancelBookingHappyPath");
+
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", BookingStatus = BookingStatus.Confirmed });
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var actual = await service.CancelBookingAsync("BKG-001");
+
+            Assert.IsTrue(actual.Success);
+            Assert.AreEqual(BookingStatus.Cancelled, context.Booking.First().BookingStatus);
+        }
+
+        //Edge case - booking doesn't exist returns not found
+        [TestMethod]
+        public async Task CancelBookingAsync_BookingNotFound_ReturnNotFound()
+        {
+            using var context = CreateContext("CancelBookingNotFound");
+
+            var service = new BookingService(context);
+            var actual = await service.CancelBookingAsync("BKG-999");
+
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.NotFound, actual.Status);
+        }
+
+        //Edge case - booking is already cancelled returns validation error
+        [TestMethod]
+        public async Task CancelBookingAsync_AlreadyCancelled_ReturnValidationError()
+        {
+            using var context = CreateContext("CancelBookingAlreadyCancelled");
+
+            context.Booking.Add(new Booking { BookingReference = "BKG-001", BookingStatus = BookingStatus.Cancelled });
+            context.SaveChanges();
+
+            var service = new BookingService(context);
+            var actual = await service.CancelBookingAsync("BKG-001");
+
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(ServiceResultStatus.ValidationError, actual.Status);
+        }
     }
 }
