@@ -222,6 +222,28 @@ namespace SaddleHeroesAirWays.API.Services
             return ServiceResult<bool>.Ok(true);
         }
 
+        public async Task<ServiceResult<bool>> CancelBookingAsync(string bookingReference)
+        {
+            var booking = await _context.Booking
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingReference == bookingReference);
+
+            if (booking == null)
+            {
+                return ServiceResult<bool>.NotFound($"Bokning {bookingReference} hittades inte.");
+            }
+
+            if(booking.BookingStatus == BookingStatus.Cancelled)
+            {
+                return ServiceResult<bool>.ValidationError($"Bokingen {bookingReference} är redan avbokad");
+            }
+
+            booking.BookingStatus = BookingStatus.Cancelled;
+            await _context.SaveChangesAsync();
+
+            return ServiceResult<bool>.Ok(true);
+        }
+
         private static IQueryable<BookingResponse> MapBookingToResponse(IQueryable<Booking> query)
         {
             return query.Select(b => new BookingResponse(
