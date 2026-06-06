@@ -151,12 +151,22 @@ namespace SaddleHeroesAirWays.API.Controllers
         }
 
 
-        [HttpPatch("{bookingReference}")]
-        public async Task<ActionResult<BookingResponse>> CancelBooking(string bookingReference)
+        [HttpPatch("{bookingReference}/cancel")]
+        public async Task<IActionResult> CancelBooking(string bookingReference)
         {
             var result = await _bookingService.CancelBookingAsync(bookingReference);
 
-            return NoContent();
+            if (!result.Success)
+            {
+                if (result.Status == ServiceResultStatus.NotFound)
+                {
+                    return NotFound(result.ErrorMessage);
+                }
+
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return NoContent(); 
         }
     }
 }

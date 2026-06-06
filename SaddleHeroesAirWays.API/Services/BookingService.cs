@@ -225,7 +225,6 @@ namespace SaddleHeroesAirWays.API.Services
         public async Task<ServiceResult<bool>> CancelBookingAsync(string bookingReference)
         {
             var booking = await _context.Booking
-                .Include(b => b.BookingDetails)
                 .FirstOrDefaultAsync(b => b.BookingReference == bookingReference);
 
             if (booking == null)
