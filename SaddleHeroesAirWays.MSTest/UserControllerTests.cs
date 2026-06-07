@@ -62,11 +62,11 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController.CreateUser(createUserRequest);
 
             var okResult = result.Result as OkObjectResult;
-            Assert.IsNotNull(okResult, "Förväntad att controllern kommer returna OK() result :)");
+            Assert.IsNotNull(okResult, "Expected that the controller returns a Ok() result");
             Assert.AreEqual(200, okResult.StatusCode);
 
-            var returnedResult = okResult.Value as ServiceResult<UserResponse>;
-            Assert.IsNotNull(returnedResult, "förväntat att värded som är returned är en ServiceResult<UserResponse>");
+            var returnedResult = okResult.Value as ServiceResult<UserResponse>; 
+            Assert.IsNotNull(returnedResult, "Expected the returned value to be a ServiceResult<UserResponse>");
             Assert.IsNotNull(returnedResult.Data);
             Assert.AreEqual("john.doe@example.com", returnedResult.Data.Email);
             Assert.AreEqual("John", returnedResult.Data.Firstname);
@@ -98,7 +98,7 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController.CreateUser(badCreateUserRequest);
 
             var badRequestResult = result.Result as BadRequestObjectResult;
-            Assert.IsNotNull(badRequestResult, "Borde returnera 400 Bad Request");
+            Assert.IsNotNull(badRequestResult, "Should return 400 Bad Request");
             Assert.AreEqual(400, badRequestResult.StatusCode);
 
             _userServiceMock.Verify(s => s.CreateUserAsync(It.IsAny<CreateUser>()), Times.Never);
@@ -121,11 +121,11 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController.GetAllUsersAlphabetical();
 
             var okResult = result as OkObjectResult;
-            Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
+            Assert.IsNotNull(okResult, "Expected to return Ok() result");
             Assert.AreEqual(200, okResult.StatusCode);
 
-            var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
-            Assert.IsNotNull(returnedUsers, "Förväntad att returnera en collection av userResponse");
+            var returnedUsers = okResult.Value as IEnumerable<UserResponse>; 
+            Assert.IsNotNull(returnedUsers, "Expected to return a collection of userResponse");
 
             var returnedUserList = returnedUsers.ToList();
             Assert.AreEqual(3, returnedUserList.Count);
@@ -146,7 +146,7 @@ namespace SaddleHeroesAirWays.MSTest
             var result = await _userController!.GetAllUsersAlphabetical();
 
             var okResult = result as OkObjectResult;
-            Assert.IsNotNull(okResult, "förväntad att returna ett Ok() result");
+            Assert.IsNotNull(okResult, "Expected to return Ok() result");
             Assert.AreEqual(200, okResult.StatusCode);
 
             var returnedUsers = okResult.Value as IEnumerable<UserResponse>;
@@ -205,7 +205,7 @@ namespace SaddleHeroesAirWays.MSTest
         {
             _userServiceMock
                 .Setup(s => s.GetUserByIdAsync(99))
-                .ReturnsAsync(ServiceResult<UserResponse>.NotFound("Användare 99 hittades inte."));
+                .ReturnsAsync(ServiceResult<UserResponse>.NotFound("User 99 not found"));
 
             var actual = await _userController.GetUserById(99);
 

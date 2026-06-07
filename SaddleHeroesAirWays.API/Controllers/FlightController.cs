@@ -19,7 +19,7 @@ namespace SaddleHeroesAirWays.API.Controllers
 
             if (!flights.Any())
             {
-                return NotFound("Inga lediga flyg hittades.");
+                return NotFound("No available flights were found.");
             }
 
             return Ok(flights);

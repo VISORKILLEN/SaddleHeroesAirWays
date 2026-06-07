@@ -118,7 +118,7 @@ namespace SaddleHeroesAirWays.MSTest
             var service = new UserService(context);
 
             var dbCount = await context.User.CountAsync();
-            Assert.AreEqual(0, dbCount, "Databasen borde vara tom :D");
+            Assert.AreEqual(0, dbCount, "Database should be empty");
 
             var result = await service.GetAllUsersAlphabeticlyAsync();
             var resultList = result.ToList();

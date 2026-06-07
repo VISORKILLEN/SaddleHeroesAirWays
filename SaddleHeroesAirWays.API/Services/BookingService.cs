@@ -45,7 +45,7 @@ namespace SaddleHeroesAirWays.API.Services
 
             if(booking == null)
             {
-                return ServiceResult<BookingResponse>.NotFound($"Bokning {bookingReference} hittades inte.");
+                return ServiceResult<BookingResponse>.NotFound($"Booking  {bookingReference}  could not be found.");
             }
 
             return ServiceResult<BookingResponse>.Ok(booking);
@@ -71,12 +71,12 @@ namespace SaddleHeroesAirWays.API.Services
             
             if(flight == null)
             {
-                return ServiceResult<BookingResponse>.NotFound($"Flyget finns inte.");
+                return ServiceResult<BookingResponse>.NotFound($"Flight does not exist.");
             }
 
             if(await IsFlightFullAsync(bookingRequest.FlightId, flight.TotalSeats))
             {
-                return ServiceResult<BookingResponse>.ValidationError($"Flyget är fullt.");
+                return ServiceResult<BookingResponse>.ValidationError($"Flight is full.");
             }
 
             var count = await _context.Booking.CountAsync();
@@ -172,7 +172,7 @@ namespace SaddleHeroesAirWays.API.Services
             
             if (booking is null) 
             { 
-                return ServiceResult<BookingResponse>.NotFound($"Bokning {bookingReference} hittades inte.");
+                return ServiceResult<BookingResponse>.NotFound($"Booking {bookingReference} could not be found.");
             }
 
             var newFlightId = updateBooking.FlightId ?? booking.FlightId;
@@ -180,12 +180,12 @@ namespace SaddleHeroesAirWays.API.Services
 
             if (flight is null) 
             { 
-                return ServiceResult<BookingResponse>.NotFound("Flyget hittades inte.");
+                return ServiceResult<BookingResponse>.NotFound("Flight could not be found.");
             } 
             
             if (flight.DepartureTime <= DateTime.Now.AddHours(1))
             {
-                return ServiceResult<BookingResponse>.ValidationError("Det går inte att omboka mindre än en timme innan avgång.");
+                return ServiceResult<BookingResponse>.ValidationError("It is not possible to rebook less then 1 hour before departure");
             }
 
             booking.FlightId = newFlightId;
@@ -208,7 +208,7 @@ namespace SaddleHeroesAirWays.API.Services
 
             if (booking == null)
             {
-                return ServiceResult<bool>.NotFound($"Bokning {bookingReference} hittades inte.");
+                return ServiceResult<bool>.NotFound($"Booking {bookingReference} could not be found.");
             }
 
             if (booking.BookingDetails != null && booking.BookingDetails.Any())
@@ -229,12 +229,12 @@ namespace SaddleHeroesAirWays.API.Services
 
             if (booking == null)
             {
-                return ServiceResult<bool>.NotFound($"Bokning {bookingReference} hittades inte.");
+                return ServiceResult<bool>.NotFound($"Booking {bookingReference} could not be found.");
             }
 
             if(booking.BookingStatus == BookingStatus.Cancelled)
             {
-                return ServiceResult<bool>.ValidationError($"Bokingen {bookingReference} är redan avbokad");
+                return ServiceResult<bool>.ValidationError($"Booking {bookingReference} is already cancelled");
             }
 
             booking.BookingStatus = BookingStatus.Cancelled;

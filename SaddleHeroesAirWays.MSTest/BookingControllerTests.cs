@@ -290,7 +290,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             _mockBookingService
                 .Setup(s => s.UpdateBookingAsync(bookingReference, updateBooking))
-                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Bokning BKG-999 hittades inte."));
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Booking BKG-999 could not be found"));
 
             var result = await _controller.UpdateBooking(bookingReference, updateBooking);
 
@@ -310,7 +310,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             _mockBookingService
                 .Setup(s => s.UpdateBookingAsync(bookingReference, updateBooking))
-                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Det går inte att omboka mindre än en timme innan avgång."));
+                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Not possible to rebook less then 1 hour before departure"));
 
             var actual = await _controller.UpdateBooking(bookingReference, updateBooking);
 
@@ -352,7 +352,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             _mockBookingService
                 .Setup(s => s.CreateBookingAsync(request))
-                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Flyget finns inte."));
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Flight does not exist"));
 
             var actual = await _controller.CreateBooking(request);
 
@@ -373,7 +373,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             _mockBookingService
                 .Setup(s => s.CreateBookingAsync(request))
-                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Flyget är fullt."));
+                .ReturnsAsync(ServiceResult<BookingResponse>.ValidationError("Flight is full"));
 
             var actual = await _controller.CreateBooking(request);
 
@@ -390,8 +390,8 @@ namespace SaddleHeroesAirWays.MSTest
 
             var validationFailures = new List<FluentValidation.Results.ValidationFailure>
             {
-                new("UserId", "UserId måste vara ett positivt tal."),
-                new("FlightId", "FlightId måste vara ett positivt tal.")
+                new("UserId", "UserId must be a positive number"),
+                new("FlightId", "FlightId must be a positive number")
             };
 
             _mockValidator
@@ -433,7 +433,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             _mockBookingService
                 .Setup(s => s.GetBookingByBookingReferenceAsync(bookingReference))
-                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Bokning BKG-999 hittades inte."));
+                .ReturnsAsync(ServiceResult<BookingResponse>.NotFound("Booking BKG-999 could not be found"));
 
             var actual = await _controller.GetBookingByBookingReference(bookingReference);
 
@@ -469,7 +469,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             var result = await _controller.DeleteBooking(bookingReference);
 
-            Assert.IsInstanceOfType(result.Result, typeof(NoContentResult), "Förväntat 204 NoContent när borttagningen är klar");
+            Assert.IsInstanceOfType(result.Result, typeof(NoContentResult), "Expected 204 NoContent when the delete is complete");
 
             _mockBookingService.Verify(s => s.DeleteBookingPermanentlyAsync(bookingReference), Times.Once);
         }
@@ -487,7 +487,7 @@ namespace SaddleHeroesAirWays.MSTest
 
             var notFoundResult = result.Result as NotFoundObjectResult;
 
-            Assert.IsNotNull(notFoundResult, "Förväntat 404 NotFound när bokningen inte finns");
+            Assert.IsNotNull(notFoundResult, "Expected 404 NotFound when the booking does not exist");
             Assert.AreEqual(404, notFoundResult.StatusCode);
 
             _mockBookingService.Verify(s => s.DeleteBookingPermanentlyAsync(bookingReference), Times.Once);
@@ -515,8 +515,8 @@ namespace SaddleHeroesAirWays.MSTest
             var bookingReference = "BKG-999";
 
             _mockBookingService
-                .Setup(s => s.CancelBookingAsync(bookingReference))
-                .ReturnsAsync(ServiceResult<bool>.NotFound("Bokningen hittades inte."));
+                .Setup(s => s.CancelBookingAsync(bookingReference)) 
+                .ReturnsAsync(ServiceResult<bool>.NotFound("Bookingen was not found"));
 
             var actual = await _controller.CancelBooking(bookingReference);
 
@@ -532,8 +532,8 @@ namespace SaddleHeroesAirWays.MSTest
             var bookingReference = "BKG-001";
 
             _mockBookingService
-                .Setup(s => s.CancelBookingAsync(bookingReference))
-                .ReturnsAsync(ServiceResult<bool>.ValidationError("Bokningen är redan avbokad."));
+                .Setup(s => s.CancelBookingAsync(bookingReference)) 
+                .ReturnsAsync(ServiceResult<bool>.ValidationError("Booking is already booked."));
 
             var actual = await _controller.CancelBooking(bookingReference);
 
