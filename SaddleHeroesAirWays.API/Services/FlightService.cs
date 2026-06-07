@@ -33,7 +33,7 @@ namespace SaddleHeroesAirWays.API.Services
                     f.ArrivalTime,
                     f.TotalSeats - f.Bookings.Count,
                     f.Price,
-                    f.FlightStatus
+                    f.FlightStatus.ToString()
                 ))
                 .ToListAsync();
         }
@@ -52,7 +52,7 @@ namespace SaddleHeroesAirWays.API.Services
                     f.ArrivalTime,
                     f.TotalSeats,
                     f.Price,
-                    f.FlightStatus
+                    f.FlightStatus.ToString()
                     ))
                 .FirstOrDefaultAsync();
 
