@@ -58,7 +58,7 @@ namespace SaddleHeroesAirWays.API.Services
 
             if (flight == null)
             {
-                return ServiceResult<FlightResponse>.NotFound("Flyget hittades inte.");
+                return ServiceResult<FlightResponse>.NotFound("Flight was not found.");
 
             }
 

@@ -40,14 +40,14 @@ namespace SaddleHeroesAirWays.API.Controllers
         {
             if (id <= 0)
             {
-                return BadRequest("Ogiltigt användar-Id.");
+                return BadRequest("Invalid UserId.");
             }
 
             var booking = await _bookingService.GetBookingsByUserIdAsync(id);
 
             if (!booking.Any())
             {
-                return NotFound($"Användare med id {id} har inga bokningar.");
+                return NotFound($"User with Id {id} have no bookings");
             }
 
             return Ok(booking);

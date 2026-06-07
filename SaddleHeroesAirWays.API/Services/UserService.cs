@@ -79,7 +79,7 @@ namespace SaddleHeroesAirWays.API.Services
 
             if(user == null)
             {
-                return ServiceResult<UserResponse>.NotFound($"Användare {id} hittades inte.");
+                return ServiceResult<UserResponse>.NotFound($"User {id} could not be found");
             }
 
             return ServiceResult<UserResponse>.Ok(user);
