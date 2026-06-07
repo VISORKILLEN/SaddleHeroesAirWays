@@ -489,11 +489,11 @@ namespace SaddleHeroesAirWays.MSTest
 
             var result = await service.DeleteBookingPermanentlyAsync("BKG-001");
 
-            Assert.IsTrue(result.Success, "Förväntade att borttagningen skulle lyckas.");
-            Assert.IsTrue(result.Data, "Förväntade true i Data.");
+            Assert.IsTrue(result.Success, "Expected the DeleteBooking to be successfull"); // "Förväntade att borttagningen skulle lyckas."
+            Assert.IsTrue(result.Data, "Expected true in Data."); // "Förväntade true i Data."
 
-            Assert.AreEqual(0, context.Booking.Count(), "Bokningen togs inte bort från databasen.");
-            Assert.AreEqual(0, context.BookingDetails.Count(), "Bokningsdetaljerna togs inte bort från databasen.");
+            Assert.AreEqual(0, context.Booking.Count(), "The booking was not removed from the database"); // "Bokningen togs inte bort från databasen."
+            Assert.AreEqual(0, context.BookingDetails.Count(), "The Bookingdetails were not removed from the database"); // "Bokningsdetaljerna togs inte bort från databasen."
         }
 
         [TestMethod]
@@ -506,12 +506,12 @@ namespace SaddleHeroesAirWays.MSTest
 
             var service = new BookingService(context);
 
-            var result = await service.DeleteBookingPermanentlyAsync("BKG-999");
+            var result = await service.DeleteBookingPermanentlyAsync("BKG-999"); //Förväntade att det skulle misslyckas då bokningen inte finns."
 
-            Assert.IsFalse(result.Success, "Förväntade att det skulle misslyckas då bokningen inte finns.");
+            Assert.IsFalse(result.Success, "Expected to fail because booking does not exist");
             Assert.AreEqual(ServiceResultStatus.NotFound, result.Status);
 
-            Assert.AreEqual(1, context.Booking.Count(), "Fel bokning togs bort.");
+            Assert.AreEqual(1, context.Booking.Count(), "Wrong booking got removed");
         }
 
         //Happy path - cancels an active booking successfully
