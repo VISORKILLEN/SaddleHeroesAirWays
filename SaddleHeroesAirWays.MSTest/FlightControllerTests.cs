@@ -40,7 +40,7 @@ namespace SaddleHeroesAirWays.MSTest
                 .Setup(s => s.SearchAvailableFlightsAsync(null))
                 .ReturnsAsync(new List<FlightResponse>
                 {
-                    new FlightResponse(1, "SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, FlightStatus.Arrived)
+                    new FlightResponse(1, "SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, "Available")
                 });
 
             var result = await _controller.SearchAvailableFlights(null);
@@ -58,7 +58,7 @@ namespace SaddleHeroesAirWays.MSTest
                 .Setup(s => s.SearchAvailableFlightsAsync("Stockholm"))
                 .ReturnsAsync(new List<FlightResponse>
                 {
-                    new FlightResponse(1, "SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, FlightStatus.Arrived)
+                    new FlightResponse(1, "SH001", "Stockholm Arlanda", "Heathrow Airport", new DateTime(2026, 6, 1), new DateTime(2026, 6, 1), 149, 150m, "Available")
                 });
             var result = await _controller.SearchAvailableFlights("Stockholm");
 
